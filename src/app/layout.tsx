@@ -1,15 +1,14 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Montserrat } from "next/font/google";
 import "./globals.css";
+import Navigation from "@/components/Navigation";
+import Footer from "@/components/Footer";
+import {Toaster} from "@/components/ui/toaster";
+import {AuthProvider} from "@/context/AuthContext";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
+const monts = Montserrat({
+    weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
+    subsets: ['latin'],
 });
 
 export const metadata: Metadata = {
@@ -23,11 +22,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
-        {children}
+    <html lang="en" className={monts.className}>
+      <body>
+          <AuthProvider>
+              <Navigation/>
+              <div className="xl:container mx-auto px-[26px] xl:px-0 mt-[70px]">
+                  {children}
+              </div>
+              <Footer/>
+              <Toaster />
+          </AuthProvider>
       </body>
     </html>
   );

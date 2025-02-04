@@ -9,6 +9,8 @@ import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {CODE} from "@/constant/constant";
 import {createPartsOfSpeech} from "@/services/apis/partsOfSpeech.service";
+import {KeyedMutator} from "swr";
+import {ResponseData} from "@/types";
 
 
 const FormSchema = z.object({
@@ -22,7 +24,7 @@ const FormSchema = z.object({
 })
 
 
-const AddParsOfSpeech = ({mutate}:{mutate: any}) => {
+const AddParsOfSpeech = ({mutate}:{mutate: KeyedMutator<ResponseData>}) => {
     const {toast} = useToast();
 
     const form = useForm<z.infer<typeof FormSchema>>({

@@ -11,12 +11,12 @@ import {
     SelectTrigger,
     SelectValue
 } from "@/components/ui/select";
-import {Curriculum, Grade} from "@/types";
+import {Curriculum, DataList, Grade, ResponseData} from "@/types";
 import {Button} from "@/components/ui/button";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import useSWR from "swr";
+import useSWR, {KeyedMutator} from "swr";
 import {getActiveCurriculums} from "@/services/apis/curriculums.servicee";
 import {getActiveGrades} from "@/services/apis/grades.service";
 import {createUnit} from "@/services/apis/units.service";
@@ -47,7 +47,7 @@ const FormSchema = z.object({
     }).min(1, {message: "Chọn lớp"})
 })
 
-const AddUnit = ({mutate}:{mutate: any}) => {
+const AddUnit = ({mutate}:{mutate: KeyedMutator<ResponseData>}) => {
     const {data: curriculumsData} = useSWR("api/curriculums/active", getActiveCurriculums)
     const [curriculumId, setCurriculumId] = React.useState<string>("")
     const [gradesData, setGradesData] = React.useState<Grade[]>([])
@@ -83,8 +83,8 @@ const AddUnit = ({mutate}:{mutate: any}) => {
 
     React.useEffect(()=>{
         if(curriculumId){
-            getActiveGrades(curriculumId).then((result: any)=>{
-                setGradesData(result.data.grades)
+            getActiveGrades(curriculumId).then((result: ResponseData)=>{
+                setGradesData((result.data as DataList).grades)
             })
         }
     },[curriculumId])

@@ -5,7 +5,7 @@ import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Form, FormControl, FormField, FormItem, FormMessage} from "@/components/ui/form";
 import {Input} from "@/components/ui/input";
-import useSWR, {mutate} from "swr";
+import useSWR, {KeyedMutator} from "swr";
 import {getPartsOfSpeechActive} from "@/services/apis/partsOfSpeech.service";
 import {
     Select,
@@ -16,7 +16,7 @@ import {
     SelectTrigger,
     SelectValue
 } from "@/components/ui/select";
-import {Curriculum, Grade, PartsOfSpeech, Unit} from "@/types";
+import {Curriculum, DataList, Grade, PartsOfSpeech, ResponseData, Unit} from "@/types";
 import {getActiveCurriculums} from "@/services/apis/curriculums.servicee";
 import {getActiveGrades} from "@/services/apis/grades.service";
 import {getActiveUnits} from "@/services/apis/units.service";
@@ -57,9 +57,9 @@ const FormSchema = z.object({
     notes: z.string().max(255, {message: "Tối đa 255 kí tự"})
 })
 
-const AddVocabulary = ({isDialogOpen, setIsDialogOpen, mutate}:{isDialogOpen: boolean, setIsDialogOpen: any, mutate: any}) => {
-    const {data: activePartsOfSpeechData} = useSWR("api/parts-of-speech/active", getPartsOfSpeechActive)
-    const {data: activeCurriculumData} = useSWR("api/curriculums/active", getActiveCurriculums)
+const AddVocabulary = ({isDialogOpen, setIsDialogOpen, mutate}:{isDialogOpen: boolean, setIsDialogOpen: (value: boolean)=>void, mutate: KeyedMutator<ResponseData>}) => {
+    const {data: activePartsOfSpeechData} = useSWR<ResponseData>("api/parts-of-speech/active", getPartsOfSpeechActive)
+    const {data: activeCurriculumData} = useSWR<ResponseData>("api/curriculums/active", getActiveCurriculums)
     const [curriculumId, setCurriculumId] = React.useState<string>("")
     const [gradeId, setGradeId] = React.useState<string>("")
 
@@ -69,16 +69,16 @@ const AddVocabulary = ({isDialogOpen, setIsDialogOpen, mutate}:{isDialogOpen: bo
 
     React.useEffect(()=>{
         if(curriculumId){
-            getActiveGrades(curriculumId).then((result: any)=>{
-                setGradesData(result.data.grades)
+            getActiveGrades(curriculumId).then((result: ResponseData)=>{
+                setGradesData((result.data as DataList).grades)
             })
         }
     },[curriculumId])
 
     React.useEffect(()=>{
         if(gradeId){
-            getActiveUnits(gradeId).then((result: any)=>{
-                setUnitsData(result.data.units)
+            getActiveUnits(gradeId).then((result: ResponseData)=>{
+                setUnitsData((result.data as DataList).units)
             })
         }
     },[gradeId])
@@ -112,7 +112,7 @@ const AddVocabulary = ({isDialogOpen, setIsDialogOpen, mutate}:{isDialogOpen: bo
         switch (result.code) {
             case CODE.CREATED:
                 form.reset();
-                mutate();
+                await mutate();
                 setIsDialogOpen(false);
                 toast({description: "Thêm từ vựng mới thành công"})
         }

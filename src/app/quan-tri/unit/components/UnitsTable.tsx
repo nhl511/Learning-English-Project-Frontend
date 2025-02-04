@@ -7,7 +7,7 @@ import {
     getPaginationRowModel,
     getSortedRowModel, SortingState, VisibilityState
 } from "@tanstack/table-core";
-import { Unit} from "@/types";
+import {ResponseData, Unit} from "@/types";
 import {flexRender, useReactTable} from "@tanstack/react-table";
 import {useToast} from "@/hooks/use-toast";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
@@ -26,8 +26,9 @@ import {updateUnitStatus} from "@/services/apis/units.service";
 import {Dialog, DialogTrigger} from "@/components/ui/dialog";
 import Update from "@/app/quan-tri/unit/components/Update";
 import Alert from "@/app/quan-tri/unit/components/Alert";
+import {KeyedMutator} from "swr";
 
-const UnitsTable = ({data, isLoading, mutate}:{data: any, isLoading: boolean, mutate: any}) => {
+const UnitsTable = ({data, isLoading, mutate}:{data: ResponseData | undefined, isLoading: boolean, mutate: KeyedMutator<ResponseData>}) => {
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})

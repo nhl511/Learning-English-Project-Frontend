@@ -8,6 +8,8 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Form, FormControl, FormField, FormItem, FormMessage} from "@/components/ui/form";
+import {KeyedMutator} from "swr";
+import {ResponseData} from "@/types";
 
 const FormSchema = z.object({
     name: z.string()
@@ -19,7 +21,7 @@ const FormSchema = z.object({
         })
 })
 
-const Update = ({id, name, mutate, isDialogOpen, setIsDialogOpen}:{id: string, name: string, mutate: any, isDialogOpen: boolean, setIsDialogOpen: any}) => {
+const Update = ({id, name, mutate, isDialogOpen, setIsDialogOpen}:{id: string, name: string, mutate: KeyedMutator<ResponseData>, isDialogOpen: boolean, setIsDialogOpen: (value: boolean)=>void}) => {
     const {toast} = useToast();
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),

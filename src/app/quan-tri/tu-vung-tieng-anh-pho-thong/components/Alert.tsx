@@ -10,8 +10,10 @@ import {
 import {CODE} from "@/constant/constant";
 import {useToast} from "@/hooks/use-toast";
 import {deleteVocabulary} from "@/services/apis/vocabularies.service";
+import {KeyedMutator} from "swr";
+import {ResponseData} from "@/types";
 
-const Alert = ({id, mutate}:{id: string, mutate: any}) => {
+const Alert = ({id, mutate}:{id: string, mutate: KeyedMutator<ResponseData>}) => {
     const {toast} = useToast();
 
     return (

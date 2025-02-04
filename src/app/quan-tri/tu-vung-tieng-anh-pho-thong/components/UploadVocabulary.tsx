@@ -2,13 +2,14 @@ import React from 'react';
 import {DialogContent, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog";
 import {Input} from "@/components/ui/input";
 import * as XLSX from "xlsx";
-import {Vocabulary} from "@/types";
+import {ResponseData, Vocabulary} from "@/types";
 import {Button} from "@/components/ui/button";
 import {createMultipleVocabulary} from "@/services/apis/vocabularies.service";
 import {CODE} from "@/constant/constant";
 import {useToast} from "@/hooks/use-toast";
+import {KeyedMutator} from "swr";
 
-const UploadVocabulary = ({isDialogOpen, setIsDialogOpen, mutate}:{isDialogOpen: boolean, setIsDialogOpen: any, mutate: any}) => {
+const UploadVocabulary = ({isDialogOpen, setIsDialogOpen, mutate}:{isDialogOpen: boolean, setIsDialogOpen: (value: boolean)=>void, mutate: KeyedMutator<ResponseData>}) => {
     const [excelData, setExcelData] = React.useState<Vocabulary[]>([]);
     const {toast} = useToast();
     const [isLoading, setIsLoading] = React.useState(false);

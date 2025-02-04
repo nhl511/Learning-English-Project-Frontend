@@ -10,8 +10,10 @@ import {
 import {deleteCurriculum} from "@/services/apis/curriculums.servicee";
 import {CODE} from "@/constant/constant";
 import {useToast} from "@/hooks/use-toast";
+import {KeyedMutator} from "swr";
+import {ResponseData} from "@/types";
 
-const Alert = ({id, mutate}:{id: string, mutate: any}) => {
+const Alert = ({id, mutate}:{id: string, mutate: KeyedMutator<ResponseData>}) => {
     const {toast} = useToast();
     return (
         <AlertDialogContent>

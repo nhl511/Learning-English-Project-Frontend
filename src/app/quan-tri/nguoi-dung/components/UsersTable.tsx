@@ -1,7 +1,7 @@
 "use client"
 
 import React from 'react';
-import {User} from "@/types";
+import {ResponseData, User} from "@/types";
 import {
     ColumnDef,
     ColumnFiltersState,
@@ -20,22 +20,18 @@ import {
 import {Button} from "@/components/ui/button";
 import {MoreHorizontal} from "lucide-react";
 import useSWR from "swr";
-import {deleteUser, getAllUsers, updateUserAdmin, updateUserStatus} from "@/services/apis/users.service";
+import {getAllUsers, updateUserAdmin, updateUserStatus} from "@/services/apis/users.service";
 import {flexRender, useReactTable} from "@tanstack/react-table";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import {useToast} from "@/hooks/use-toast";
 import {CODE} from "@/constant/constant";
 import {
-    AlertDialog, AlertDialogAction, AlertDialogCancel,
-    AlertDialogContent,
-    AlertDialogDescription, AlertDialogFooter,
-    AlertDialogHeader,
-    AlertDialogTitle, AlertDialogTrigger
+    AlertDialog, AlertDialogTrigger
 } from "@/components/ui/alert-dialog";
 import Alert from "@/app/quan-tri/nguoi-dung/components/Alert";
 
 const UsersTable = () => {
-    const {data, isLoading, mutate} = useSWR("/api/users", () => getAllUsers(localStorage.getItem("access-token")));
+    const {data, isLoading, mutate} = useSWR<ResponseData>("/api/users", () => getAllUsers(localStorage.getItem("access-token")));
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})

@@ -17,6 +17,7 @@ const Auth = ({userLinks}:{userLinks: NavigationItem[]}) => {
     const router = useRouter();
 
     const handleLogout = () => {
+        if(!authContext) return null;
         authContext.setToken(null)
         authContext.setUser(null)
         localStorage.removeItem("access-token");
@@ -25,10 +26,11 @@ const Auth = ({userLinks}:{userLinks: NavigationItem[]}) => {
     }
 
     React.useEffect(() => {
-        if(authContext.token)
+        if(authContext?.token)
             authContext.fetchUserData();
-    }, [authContext.token]);
+    }, [authContext?.token]);
 
+    if(!authContext) return null;
 
     return (
         <div className="flex gap-[26px]">

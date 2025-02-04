@@ -9,6 +9,8 @@ import {Form, FormControl, FormField, FormItem, FormMessage} from "@/components/
 import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
+import {KeyedMutator} from "swr";
+import {ResponseData} from "@/types";
 
 
 const FormSchema = z.object({
@@ -22,7 +24,7 @@ const FormSchema = z.object({
 })
 
 
-const AddCurriculum = ({mutate}:{mutate: any}) => {
+const AddCurriculum = ({mutate}:{mutate: KeyedMutator<ResponseData>}) => {
     const {toast} = useToast();
 
     const form = useForm<z.infer<typeof FormSchema>>({
@@ -38,7 +40,7 @@ const AddCurriculum = ({mutate}:{mutate: any}) => {
         const result = await createCurriculum({name: data.name, jwt: localStorage.getItem("access-token")});
         switch (result.code){
             case CODE.CREATED:
-                mutate();
+                await mutate();
                 form.reset();
                 toast({
                     description: "Tạo giáo trình thành công",

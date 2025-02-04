@@ -15,8 +15,8 @@ import {
     SelectTrigger,
     SelectValue
 } from "@/components/ui/select";
-import useSWR from "swr";
-import {Curriculum} from "@/types";
+import useSWR, {KeyedMutator} from "swr";
+import {Curriculum, ResponseData} from "@/types";
 import {getActiveCurriculums} from "@/services/apis/curriculums.servicee";
 import {createGrade} from "@/services/apis/grades.service";
 import {CODE} from "@/constant/constant";
@@ -36,9 +36,9 @@ const FormSchema = z.object({
     })
 })
 
-const AddGrade = ({mutate}:{mutate: any}) => {
+const AddGrade = ({mutate}:{mutate: KeyedMutator<ResponseData>}) => {
     const {toast} = useToast();
-    const {data, isLoading} = useSWR("api/curriculums/active", getActiveCurriculums)
+    const {data} = useSWR("api/curriculums/active", getActiveCurriculums)
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {

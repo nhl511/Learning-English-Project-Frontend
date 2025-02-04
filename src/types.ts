@@ -1,9 +1,11 @@
+import {LucideIcon} from "lucide-react";
+
 export interface NavigationItem {
     title: string,
     path?: string,
 }
 export interface SideMenuItem extends NavigationItem{
-    icon: any;
+    icon: LucideIcon;
     subMenuItems?: NavigationItem[]
 }
 export interface User {
@@ -85,4 +87,12 @@ export interface Jwt {
     userId: string,
     isAdmin: boolean,
     exp: number
+}
+
+export interface AuthContextType {
+    token: string | null;
+    setToken: (token: string | null) => void;
+    user: User | null;
+    setUser: (user: User | null) => void;
+    fetchUserData: () => Promise<void>;
 }

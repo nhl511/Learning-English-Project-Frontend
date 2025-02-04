@@ -3,10 +3,10 @@ import {useToast} from "@/hooks/use-toast";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import useSWR from "swr";
+import useSWR, {KeyedMutator} from "swr";
 import {getPartsOfSpeechActive} from "@/services/apis/partsOfSpeech.service";
 import {getActiveCurriculums} from "@/services/apis/curriculums.servicee";
-import {Curriculum, Grade, PartsOfSpeech, Unit} from "@/types";
+import {Curriculum, DataList, Grade, PartsOfSpeech, ResponseData, Unit} from "@/types";
 import {DialogContent, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog";
 import {Form, FormControl, FormField, FormItem, FormMessage} from "@/components/ui/form";
 import {Input} from "@/components/ui/input";
@@ -59,7 +59,7 @@ const FormSchema = z.object({
 })
 
 
-const Update = ({id, vocabulary, definition, transcription, partsOfSpeechId, curriculumId, setCurriculumId, gradeId, setGradeId, unitId, notes, mutate, isDialogOpen, setIsDialogOpen}:{id: string, vocabulary: string, definition: string, transcription: string, partsOfSpeechId: string | undefined, curriculumId: string, setCurriculumId: any, gradeId: string, setGradeId: any, unitId: string, notes: string, mutate: any, isDialogOpen: boolean, setIsDialogOpen: any}) => {
+const Update = ({id, vocabulary, definition, transcription, partsOfSpeechId, curriculumId, setCurriculumId, gradeId, setGradeId, unitId, notes, mutate, isDialogOpen, setIsDialogOpen}:{id: string, vocabulary: string, definition: string, transcription: string, partsOfSpeechId: string | undefined, curriculumId: string, setCurriculumId: (value: string)=>void, gradeId: string, setGradeId: (value: string)=>void, unitId: string, notes: string, mutate: KeyedMutator<ResponseData>, isDialogOpen: boolean, setIsDialogOpen: (value:boolean)=>void}) => {
     const {toast} = useToast();
     const {data: activePartsOfSpeechData} = useSWR("api/parts-of-speech/active", getPartsOfSpeechActive)
     const {data: activeCurriculumData} = useSWR("api/curriculums/active", getActiveCurriculums)
@@ -92,16 +92,16 @@ const Update = ({id, vocabulary, definition, transcription, partsOfSpeechId, cur
     React.useEffect(()=>{
         if(curriculumId){
             getActiveGrades(curriculumId)
-                .then((result: any)=>{
-                    setGradesData(result.data.grades)
+                .then((result: ResponseData)=>{
+                    setGradesData((result.data as DataList).grades);
                 })
         }
     },[curriculumId])
 
     React.useEffect(()=>{
         if(gradeId){
-            getActiveUnits(gradeId).then((result: any)=>{
-                setUnitsData(result.data.units)
+            getActiveUnits(gradeId).then((result: ResponseData)=>{
+                setUnitsData((result.data as DataList).units)
             })
         }
     },[gradeId])

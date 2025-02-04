@@ -7,7 +7,7 @@ import {
     getPaginationRowModel,
     getSortedRowModel, SortingState, VisibilityState
 } from "@tanstack/table-core";
-import {Curriculum} from "@/types";
+import {Curriculum, ResponseData} from "@/types";
 import {flexRender, useReactTable} from "@tanstack/react-table";
 import {useToast} from "@/hooks/use-toast";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
@@ -26,8 +26,9 @@ import {AlertDialog, AlertDialogTrigger} from "@/components/ui/alert-dialog";
 import {Dialog, DialogTrigger} from "@/components/ui/dialog";
 import Alert from "@/app/quan-tri/khung-chuong-trinh/components/Alert";
 import Update from "@/app/quan-tri/khung-chuong-trinh/components/Update";
+import {KeyedMutator} from "swr";
 
-const CurriculumsTable = ({data, isLoading, mutate}:{data: any, isLoading: boolean, mutate: any}) => {
+const CurriculumsTable = ({data, isLoading, mutate}:{data: ResponseData | undefined, isLoading: boolean, mutate: KeyedMutator<ResponseData>}) => {
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
@@ -79,7 +80,7 @@ const CurriculumsTable = ({data, isLoading, mutate}:{data: any, isLoading: boole
                                 })
                                 switch (result?.code) {
                                     case CODE.SUCCESS:
-                                        mutate();
+                                        await mutate();
                                         toast({
                                             description: "Cập nhật trạng thái giáo trình thành công",
                                         })

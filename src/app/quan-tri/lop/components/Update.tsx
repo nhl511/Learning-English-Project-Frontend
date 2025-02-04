@@ -1,7 +1,7 @@
 import React from 'react';
 import {z} from "zod";
 import {useToast} from "@/hooks/use-toast";
-import useSWR from "swr";
+import useSWR, {KeyedMutator} from "swr";
 import {getActiveCurriculums} from "@/services/apis/curriculums.servicee";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
@@ -18,7 +18,7 @@ import {
     SelectTrigger,
     SelectValue
 } from "@/components/ui/select";
-import {Curriculum} from "@/types";
+import {Curriculum, ResponseData} from "@/types";
 import {updateGrade} from "@/services/apis/grades.service";
 import {CODE} from "@/constant/constant";
 
@@ -35,9 +35,9 @@ const FormSchema = z.object({
     })
 })
 
-const Update = ({id, grade, curriculumId, mutate, isDialogOpen, setIsDialogOpen}:{id: string, grade: number, curriculumId: string, mutate: any, isDialogOpen: boolean, setIsDialogOpen: any}) => {
+const Update = ({id, grade, curriculumId, mutate, isDialogOpen, setIsDialogOpen}:{id: string, grade: number, curriculumId: string, mutate: KeyedMutator<ResponseData>, isDialogOpen: boolean, setIsDialogOpen: (value: boolean)=>void}) => {
     const {toast} = useToast();
-    const {data, isLoading} = useSWR("api/curriculums/active", getActiveCurriculums)
+    const {data} = useSWR("api/curriculums/active", getActiveCurriculums)
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
         defaultValues: {

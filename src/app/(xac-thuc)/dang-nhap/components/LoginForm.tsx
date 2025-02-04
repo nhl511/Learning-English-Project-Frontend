@@ -51,6 +51,7 @@ const LoginForm = () => {
                     description: "Đăng nhập thành công!",
                 })
                 if(result.accessToken){
+                    if(!authContext) return null;
                     localStorage.setItem("access-token", result.accessToken);
                     document.cookie = `access-token=${result.accessToken}; path=/;`;
                     authContext.setToken(result.accessToken);

@@ -4,9 +4,10 @@ import AddCurriculum from "@/app/quan-tri/khung-chuong-trinh/components/AddCurri
 import CurriculumsTable from "@/app/quan-tri/khung-chuong-trinh/components/CurriculumsTable";
 import useSWR from "swr";
 import {getAllCurriculums} from "@/services/apis/curriculums.servicee";
+import {ResponseData} from "@/types";
 
 const CurriculumsWrapper = () => {
-    const {data, isLoading, mutate} = useSWR("api/curriculums", () => getAllCurriculums(localStorage.getItem("access-token")));
+    const {data, isLoading, mutate} = useSWR<ResponseData>("api/curriculums", () => getAllCurriculums(localStorage.getItem("access-token")));
 
     return (
         <div className="grid grid-cols-12 mt-5 space-x-8">

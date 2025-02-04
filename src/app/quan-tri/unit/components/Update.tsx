@@ -11,14 +11,14 @@ import {
     SelectTrigger,
     SelectValue
 } from "@/components/ui/select";
-import {Curriculum, Grade} from "@/types";
+import {Curriculum, DataList, Grade, ResponseData} from "@/types";
 import {Button} from "@/components/ui/button";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {getActiveGrades} from "@/services/apis/grades.service";
 import {CODE} from "@/constant/constant";
-import useSWR from "swr";
+import useSWR, {KeyedMutator} from "swr";
 import {getActiveCurriculums} from "@/services/apis/curriculums.servicee";
 import {updateUnit} from "@/services/apis/units.service";
 import {useToast} from "@/hooks/use-toast";
@@ -46,7 +46,7 @@ const FormSchema = z.object({
     }).min(1, {message: "Chọn lớp"})
 })
 
-const Update = ({id, unitNumber, unitName, curriculumId, setCurriculumId, gradeId, isDialogOpen, setIsDialogOpen, mutate}:{id: string, unitNumber: number, unitName: string, curriculumId: string, setCurriculumId: any, gradeId: string, isDialogOpen: boolean, setIsDialogOpen: any, mutate: any}) => {
+const Update = ({id, unitNumber, unitName, curriculumId, setCurriculumId, gradeId, isDialogOpen, setIsDialogOpen, mutate}:{id: string, unitNumber: number, unitName: string, curriculumId: string, setCurriculumId: (value: string)=>void, gradeId: string, isDialogOpen: boolean, setIsDialogOpen: (value: boolean)=>void, mutate: KeyedMutator<ResponseData>}) => {
     const {data: curriculumsData} = useSWR("api/curriculums/active", getActiveCurriculums)
     const [gradesData, setGradesData] = React.useState<Grade[]>([])
     const {toast} = useToast();
@@ -80,8 +80,8 @@ const Update = ({id, unitNumber, unitName, curriculumId, setCurriculumId, gradeI
     React.useEffect(()=>{
         if(curriculumId){
             getActiveGrades(curriculumId)
-                .then((result: any)=>{
-                    setGradesData(result.data.grades)
+                .then((result: ResponseData)=>{
+                    setGradesData((result.data as DataList).grades)
                 })
         }
     },[curriculumId])

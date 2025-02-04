@@ -6,7 +6,7 @@ import {
     getPaginationRowModel,
     getSortedRowModel, SortingState, VisibilityState
 } from "@tanstack/table-core";
-import {Vocabulary} from "@/types";
+import {ResponseData, Vocabulary} from "@/types";
 import {flexRender, useReactTable} from "@tanstack/react-table";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import {
@@ -25,8 +25,9 @@ import {AlertDialog, AlertDialogTrigger} from "@/components/ui/alert-dialog";
 import Alert from "@/app/quan-tri/tu-vung-tieng-anh-pho-thong/components/Alert";
 import {Dialog, DialogTrigger} from "@/components/ui/dialog";
 import Update from "@/app/quan-tri/tu-vung-tieng-anh-pho-thong/components/Update";
+import {KeyedMutator} from "swr";
 
-const VocabulariesTable = ({data, isLoading, mutate}:{data: any, isLoading: boolean, mutate: any}) => {
+const VocabulariesTable = ({data, isLoading, mutate}:{data: ResponseData | undefined, isLoading: boolean, mutate: KeyedMutator<ResponseData>}) => {
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})

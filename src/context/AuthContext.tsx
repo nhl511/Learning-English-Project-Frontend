@@ -2,7 +2,7 @@
 import React, {ReactNode} from 'react';
 import {jwtDecode} from "jwt-decode";
 import {getUserById} from "@/services/apis/users.service";
-import {Jwt, User} from "@/types";
+import {AuthContextType, Jwt, User} from "@/types";
 import {useRouter} from "next/navigation";
 import {
     AlertDialog, AlertDialogAction,
@@ -12,7 +12,7 @@ import {
     AlertDialogTitle
 } from "@/components/ui/alert-dialog";
 
-const AuthContext = React.createContext<any>(undefined);
+const AuthContext = React.createContext<AuthContextType | null>(null);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const [token, setToken] = React.useState<string | null>(null);
     const [user, setUser] = React.useState<User | null>(null);

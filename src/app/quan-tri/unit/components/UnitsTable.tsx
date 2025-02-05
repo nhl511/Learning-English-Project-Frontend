@@ -84,7 +84,7 @@ const UnitsTable = () => {
             header: "Lớp",
             cell: ({ row }) => {
                 const grade = row.original.GRADE.GRADE_NUMBER
-                return <div>Lớp {grade}</div>;
+                return <div>Grade {grade}</div>;
             },
         },
         {

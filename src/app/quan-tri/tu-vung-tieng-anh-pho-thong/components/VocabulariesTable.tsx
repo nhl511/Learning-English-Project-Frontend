@@ -101,7 +101,7 @@ const VocabulariesTable = () => {
             header: "Lớp",
             cell: ({ row }) => {
                 const grade = row.original.UNIT.GRADE.GRADE_NUMBER
-                return <div>Lớp {grade}</div>;
+                return <div>Grade {grade}</div>;
             },
         },
         {

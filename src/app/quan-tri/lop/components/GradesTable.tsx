@@ -58,7 +58,7 @@ const GradesTable = () => {
             accessorKey: "GRADE_NUMBER",
             header: "Lớp",
             cell: ({ row }) => (
-                <div>Lớp {row.getValue("GRADE_NUMBER")}</div>
+                <div>Grade {row.getValue("GRADE_NUMBER")}</div>
             ),
         },
         {

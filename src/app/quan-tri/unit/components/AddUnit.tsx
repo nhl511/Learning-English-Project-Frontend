@@ -16,7 +16,7 @@ import {Button} from "@/components/ui/button";
 import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
-import useSWR, {KeyedMutator} from "swr";
+import useSWR, {useSWRConfig} from "swr";
 import {getActiveCurriculums} from "@/services/apis/curriculums.servicee";
 import {getActiveGrades} from "@/services/apis/grades.service";
 import {createUnit} from "@/services/apis/units.service";
@@ -47,11 +47,13 @@ const FormSchema = z.object({
     }).min(1, {message: "Chọn lớp"})
 })
 
-const AddUnit = ({mutate}:{mutate: KeyedMutator<ResponseData>}) => {
+const AddUnit = () => {
     const {data: curriculumsData} = useSWR("api/curriculums/active", getActiveCurriculums)
     const [curriculumId, setCurriculumId] = React.useState<string>("")
     const [gradesData, setGradesData] = React.useState<Grade[]>([])
     const {toast} = useToast();
+    const { mutate } = useSWRConfig();
+
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -65,7 +67,7 @@ const AddUnit = ({mutate}:{mutate: KeyedMutator<ResponseData>}) => {
         const result = await createUnit({unitNumber: data.unitNumber, unitName: data.unitName, gradeId: data.gradeId, jwt: localStorage.getItem("access-token")})
         switch (result.code) {
             case CODE.CREATED:
-                mutate();
+                await mutate((key: string) => key.startsWith('api/units?page='));
                 toast({
                     description: "Tạo unit thành công"
                 })

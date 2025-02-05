@@ -4,10 +4,9 @@ import {
     ColumnDef, ColumnFiltersState,
     getCoreRowModel,
     getFilteredRowModel,
-    getPaginationRowModel,
     getSortedRowModel, SortingState, VisibilityState
 } from "@tanstack/table-core";
-import {ResponseData, Unit} from "@/types";
+import {DataList, Unit} from "@/types";
 import {flexRender, useReactTable} from "@tanstack/react-table";
 import {useToast} from "@/hooks/use-toast";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
@@ -20,15 +19,22 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {Button} from "@/components/ui/button";
 import {Copy, MoreHorizontal} from "lucide-react";
-import {CODE} from "@/constant/constant";
+import {CODE, PAGE} from "@/constant/constant";
 import {AlertDialog, AlertDialogTrigger} from "@/components/ui/alert-dialog";
-import {updateUnitStatus} from "@/services/apis/units.service";
+import {getAllUnits, updateUnitStatus} from "@/services/apis/units.service";
 import {Dialog, DialogTrigger} from "@/components/ui/dialog";
 import Update from "@/app/quan-tri/unit/components/Update";
 import Alert from "@/app/quan-tri/unit/components/Alert";
-import {KeyedMutator} from "swr";
+import useSWR from "swr";
 
-const UnitsTable = ({data, isLoading, mutate}:{data: ResponseData | undefined, isLoading: boolean, mutate: KeyedMutator<ResponseData>}) => {
+const UnitsTable = () => {
+    const [page, setPage] = React.useState<number>(PAGE.INITIAL);
+    const {data, isLoading, mutate} = useSWR(`api/units?page=${page}`, () => getAllUnits({
+        jwt: localStorage.getItem("access-token"),
+        page,
+        pageSize: PAGE.SIZE
+    }));
+
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
@@ -45,7 +51,7 @@ const UnitsTable = ({data, isLoading, mutate}:{data: ResponseData | undefined, i
             id: "serial",
             header: "STT",
             cell: ({ row }) => (
-                <div>{row.index + 1}</div>
+                <div>{(page - 1) * PAGE.SIZE + row.index + 1}</div>
             ),
         },
         {
@@ -152,7 +158,7 @@ const UnitsTable = ({data, isLoading, mutate}:{data: ResponseData | undefined, i
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
         getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
+        // getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         onColumnVisibilityChange: setColumnVisibility,
@@ -163,6 +169,8 @@ const UnitsTable = ({data, isLoading, mutate}:{data: ResponseData | undefined, i
             columnVisibility,
             rowSelection,
         },
+        manualPagination: true,
+        rowCount: (data?.data as DataList)?.count,
     })
 
 
@@ -171,57 +179,75 @@ const UnitsTable = ({data, isLoading, mutate}:{data: ResponseData | undefined, i
     return (
         <AlertDialog>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <div className="rounded-md border">
-                <Table>
-                    <TableHeader>
-                        {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => {
-                                    return (
-                                        <TableHead key={header.id}>
-                                            {header.isPlaceholder
-                                                ? null
-                                                : flexRender(
-                                                    header.column.columnDef.header,
-                                                    header.getContext()
-                                                )}
-                                        </TableHead>
-                                    )
-                                })}
-                            </TableRow>
-                        ))}
-                    </TableHeader>
-                    <TableBody>
-                        {table.getRowModel().rows?.length ? (
-                            table.getRowModel().rows
-                                .map((row) => (
-                                    <TableRow
-                                        key={row.id}
-                                        data-state={row.getIsSelected() && "selected"}
+                <div className="rounded-md border">
+                    <Table>
+                        <TableHeader>
+                            {table.getHeaderGroups().map((headerGroup) => (
+                                <TableRow key={headerGroup.id}>
+                                    {headerGroup.headers.map((header) => {
+                                        return (
+                                            <TableHead key={header.id}>
+                                                {header.isPlaceholder
+                                                    ? null
+                                                    : flexRender(
+                                                        header.column.columnDef.header,
+                                                        header.getContext()
+                                                    )}
+                                            </TableHead>
+                                        )
+                                    })}
+                                </TableRow>
+                            ))}
+                        </TableHeader>
+                        <TableBody>
+                            {table.getRowModel().rows?.length ? (
+                                table.getRowModel().rows
+                                    .map((row) => (
+                                        <TableRow
+                                            key={row.id}
+                                            data-state={row.getIsSelected() && "selected"}
+                                        >
+                                            {row.getVisibleCells().map((cell) => (
+                                                <TableCell key={cell.id}>
+                                                    {flexRender(
+                                                        cell.column.columnDef.cell,
+                                                        cell.getContext()
+                                                    )}
+                                                </TableCell>
+                                            ))}
+                                        </TableRow>
+                                    ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell
+                                        colSpan={columns.length}
+                                        className="h-24 text-center"
                                     >
-                                        {row.getVisibleCells().map((cell) => (
-                                            <TableCell key={cell.id}>
-                                                {flexRender(
-                                                    cell.column.columnDef.cell,
-                                                    cell.getContext()
-                                                )}
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                ))
-                        ) : (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={columns.length}
-                                    className="h-24 text-center"
-                                >
-                                    No results.
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
+                                        No results.
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </div>
+                <div className="flex items-center justify-end space-x-2 py-4">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setPage((prev: number) => prev - 1)}
+                        disabled={page === 1}
+                    >
+                        Trước
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setPage((prev: number) => prev + 1)}
+                        disabled={10 * page >= (data?.data as DataList)?.count}
+                    >
+                        Sau
+                    </Button>
+                </div>
                 <Update
                     id={unitId}
                     unitNumber={unitNumber}

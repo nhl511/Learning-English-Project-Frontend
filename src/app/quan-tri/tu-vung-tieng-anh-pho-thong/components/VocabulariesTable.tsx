@@ -3,10 +3,9 @@ import {
     ColumnDef, ColumnFiltersState,
     getCoreRowModel,
     getFilteredRowModel,
-    getPaginationRowModel,
     getSortedRowModel, SortingState, VisibilityState
 } from "@tanstack/table-core";
-import {ResponseData, Vocabulary} from "@/types";
+import {DataList, Vocabulary} from "@/types";
 import {flexRender, useReactTable} from "@tanstack/react-table";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import {
@@ -18,16 +17,22 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {Button} from "@/components/ui/button";
 import {MoreHorizontal} from "lucide-react";
-import {CODE} from "@/constant/constant";
-import {updateVocabularyStatus} from "@/services/apis/vocabularies.service";
+import {CODE, PAGE} from "@/constant/constant";
+import {getAllVocabularies, updateVocabularyStatus} from "@/services/apis/vocabularies.service";
 import {useToast} from "@/hooks/use-toast";
 import {AlertDialog, AlertDialogTrigger} from "@/components/ui/alert-dialog";
 import Alert from "@/app/quan-tri/tu-vung-tieng-anh-pho-thong/components/Alert";
 import {Dialog, DialogTrigger} from "@/components/ui/dialog";
 import Update from "@/app/quan-tri/tu-vung-tieng-anh-pho-thong/components/Update";
-import {KeyedMutator} from "swr";
+import useSWR from "swr";
 
-const VocabulariesTable = ({data, isLoading, mutate}:{data: ResponseData | undefined, isLoading: boolean, mutate: KeyedMutator<ResponseData>}) => {
+const VocabulariesTable = () => {
+    const [page, setPage] = React.useState<number>(PAGE.INITIAL);
+    const {data, isLoading, mutate} = useSWR(`api/vocabularies?page=${page}`, () => getAllVocabularies({
+        jwt: localStorage.getItem("access-token"),
+        page,
+        pageSize: PAGE.SIZE,
+    }))
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
@@ -50,7 +55,7 @@ const VocabulariesTable = ({data, isLoading, mutate}:{data: ResponseData | undef
             id: "serial",
             header: "STT",
             cell: ({ row }) => (
-                <div>{row.index + 1}</div>
+                <div>{(page - 1) * PAGE.SIZE + row.index + 1}</div>
             ),
         },
         {
@@ -180,7 +185,7 @@ const VocabulariesTable = ({data, isLoading, mutate}:{data: ResponseData | undef
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
         getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
+        // getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         onColumnVisibilityChange: setColumnVisibility,
@@ -191,6 +196,8 @@ const VocabulariesTable = ({data, isLoading, mutate}:{data: ResponseData | undef
             columnVisibility,
             rowSelection,
         },
+        manualPagination: true,
+        rowCount: (data?.data as DataList)?.count,
     })
 
     if(isLoading) return <p>loading...</p>
@@ -250,7 +257,28 @@ const VocabulariesTable = ({data, isLoading, mutate}:{data: ResponseData | undef
                         </TableBody>
                     </Table>
                 </div>
-                <Update id={vocabularyId} vocabulary={vocabulary} definition={definition} transcription={transcription} partsOfSpeechId={partsOfSpeechId} curriculumId={curriculumId} setCurriculumId={setCurriculumId} gradeId={gradeId} setGradeId={setGradeId} unitId={unitId} notes={notes} mutate={mutate} isDialogOpen={isDialogOpen} setIsDialogOpen={setIsDialogOpen}/>
+                <div className="flex items-center justify-end space-x-2 py-4">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setPage((prev: number)=> prev - 1)}
+                        disabled={page === 1}
+                    >
+                        Trước
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setPage((prev: number)=> prev + 1)}
+                        disabled={10 * page >= (data?.data as DataList)?.count}
+                    >
+                        Sau
+                    </Button>
+                </div>
+                <Update id={vocabularyId} vocabulary={vocabulary} definition={definition} transcription={transcription}
+                        partsOfSpeechId={partsOfSpeechId} curriculumId={curriculumId} setCurriculumId={setCurriculumId}
+                        gradeId={gradeId} setGradeId={setGradeId} unitId={unitId} notes={notes} mutate={mutate}
+                        isDialogOpen={isDialogOpen} setIsDialogOpen={setIsDialogOpen}/>
             </Dialog>
             <Alert id={vocabularyId} mutate={mutate}/>
         </AlertDialog>

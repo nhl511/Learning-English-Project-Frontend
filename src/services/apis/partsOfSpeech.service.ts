@@ -2,10 +2,14 @@ import {ResponseData} from "@/types";
 import {apiCaller} from "@/axios/client";
 import {ENDPOINTS} from "@/services/apis/api-endpoints.service";
 
-export const getAllPartsOfSpeech = async (jwt: string | null): Promise<ResponseData> => {
+export const getAllPartsOfSpeech = async ({jwt, page, pageSize}:{jwt: string | null, page: number, pageSize: number}): Promise<ResponseData> => {
     const result: ResponseData = await apiCaller.get(ENDPOINTS.partsOfSpeech.base, {
         headers: {
             Authorization: `Bearer ${jwt}`,
+        },
+        params: {
+            page,
+            pageSize,
         }
     })
     return result;

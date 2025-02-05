@@ -2,10 +2,14 @@ import {apiCaller} from "@/axios/client";
 import {ENDPOINTS} from "@/services/apis/api-endpoints.service";
 import {ResponseData} from "@/types";
 
-export const getAllUnits = async(jwt: string | null): Promise<ResponseData> => {
+export const getAllUnits = async({jwt, page, pageSize}:{jwt: string | null, page: number, pageSize: number}): Promise<ResponseData> => {
     const result: ResponseData = await apiCaller.get(ENDPOINTS.units.base, {
         headers: {
             Authorization: `Bearer ${jwt}`,
+        },
+        params: {
+            page,
+            pageSize,
         }
     })
     return result

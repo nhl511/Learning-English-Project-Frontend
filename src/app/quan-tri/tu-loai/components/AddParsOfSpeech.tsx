@@ -9,8 +9,7 @@ import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {CODE} from "@/constant/constant";
 import {createPartsOfSpeech} from "@/services/apis/partsOfSpeech.service";
-import {KeyedMutator} from "swr";
-import {ResponseData} from "@/types";
+import {useSWRConfig} from "swr";
 
 
 const FormSchema = z.object({
@@ -24,8 +23,9 @@ const FormSchema = z.object({
 })
 
 
-const AddParsOfSpeech = ({mutate}:{mutate: KeyedMutator<ResponseData>}) => {
+const AddParsOfSpeech = () => {
     const {toast} = useToast();
+    const { mutate } = useSWRConfig();
 
     const form = useForm<z.infer<typeof FormSchema>>({
         resolver: zodResolver(FormSchema),
@@ -38,7 +38,7 @@ const AddParsOfSpeech = ({mutate}:{mutate: KeyedMutator<ResponseData>}) => {
         const result = await createPartsOfSpeech({name: data.name, jwt: localStorage.getItem("access-token")});
         switch (result.code){
             case CODE.CREATED:
-                mutate();
+                await mutate((key: string) => key.startsWith('api/parts-of-speech?page='));
                 form.reset();
                 toast({
                     description: "Tạo từ loại thành công",

@@ -6,3 +6,8 @@ export const CODE = {
     CONFLICT: 409,
     BANNED: 423,
 }
+
+export const PAGE = {
+    SIZE: 10,
+    INITIAL: 1,
+}

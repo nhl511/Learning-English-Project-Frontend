@@ -1,8 +1,6 @@
 "use client"
 import React from 'react';
 import VocabulariesTable from "@/app/quan-tri/tu-vung-tieng-anh-pho-thong/components/VocabulariesTable";
-import useSWR from "swr";
-import {getAllVocabularies} from "@/services/apis/vocabularies.service";
 import {Dialog} from "@/components/ui/dialog";
 import AddVocabulary from "@/app/quan-tri/tu-vung-tieng-anh-pho-thong/components/AddVocabulary";
 import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger} from "@/components/ui/dropdown-menu";
@@ -11,7 +9,6 @@ import {FileUp, Plus} from "lucide-react";
 import UploadVocabulary from "@/app/quan-tri/tu-vung-tieng-anh-pho-thong/components/UploadVocabulary";
 
 const VocabularyWrapper = () => {
-    const {data, isLoading, mutate} = useSWR("api/vocabularies", () => getAllVocabularies(localStorage.getItem("access-token")))
     const [isAddVocabularyDialogOpen, setIsAddVocabularyDialogOpen] = React.useState(false);
     const [isUploadVocabularyDialogOpen, setIsUploadVocabularyDialogOpen] = React.useState(false);
     return (
@@ -28,12 +25,12 @@ const VocabularyWrapper = () => {
                     </DropdownMenuContent>
                 </DropdownMenu>
             <Dialog open={isAddVocabularyDialogOpen} onOpenChange={setIsAddVocabularyDialogOpen}>
-                <AddVocabulary isDialogOpen={isAddVocabularyDialogOpen} setIsDialogOpen={setIsAddVocabularyDialogOpen} mutate={mutate}/>
+                <AddVocabulary isDialogOpen={isAddVocabularyDialogOpen} setIsDialogOpen={setIsAddVocabularyDialogOpen}/>
             </Dialog>
             <Dialog open={isUploadVocabularyDialogOpen} onOpenChange={setIsUploadVocabularyDialogOpen}>
-                <UploadVocabulary isDialogOpen={isUploadVocabularyDialogOpen} setIsDialogOpen={setIsUploadVocabularyDialogOpen} mutate={mutate}/>
+                <UploadVocabulary isDialogOpen={isUploadVocabularyDialogOpen} setIsDialogOpen={setIsUploadVocabularyDialogOpen}/>
             </Dialog>
-            <VocabulariesTable data={data} isLoading={isLoading} mutate={mutate}/>
+            <VocabulariesTable/>
         </div>
     );
 };

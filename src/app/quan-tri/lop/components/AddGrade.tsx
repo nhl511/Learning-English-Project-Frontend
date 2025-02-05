@@ -15,8 +15,8 @@ import {
     SelectTrigger,
     SelectValue
 } from "@/components/ui/select";
-import useSWR, {KeyedMutator} from "swr";
-import {Curriculum, ResponseData} from "@/types";
+import useSWR, {useSWRConfig} from "swr";
+import {Curriculum} from "@/types";
 import {getActiveCurriculums} from "@/services/apis/curriculums.servicee";
 import {createGrade} from "@/services/apis/grades.service";
 import {CODE} from "@/constant/constant";
@@ -36,7 +36,8 @@ const FormSchema = z.object({
     })
 })
 
-const AddGrade = ({mutate}:{mutate: KeyedMutator<ResponseData>}) => {
+const AddGrade = () => {
+    const { mutate } = useSWRConfig();
     const {toast} = useToast();
     const {data} = useSWR("api/curriculums/active", getActiveCurriculums)
     const form = useForm<z.infer<typeof FormSchema>>({
@@ -54,7 +55,7 @@ const AddGrade = ({mutate}:{mutate: KeyedMutator<ResponseData>}) => {
         })
         switch (result.code) {
             case CODE.CREATED:
-                mutate();
+                await mutate((key: string) => key.startsWith('api/grades?page='));
                 form.resetField("grade")
                 toast({
                     description: "Thêm lớp thành công"

@@ -4,10 +4,9 @@ import {
     ColumnDef, ColumnFiltersState,
     getCoreRowModel,
     getFilteredRowModel,
-    getPaginationRowModel,
     getSortedRowModel, SortingState, VisibilityState
 } from "@tanstack/table-core";
-import {Curriculum, ResponseData} from "@/types";
+import {Curriculum, DataList, ResponseData} from "@/types";
 import {flexRender, useReactTable} from "@tanstack/react-table";
 import {useToast} from "@/hooks/use-toast";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
@@ -20,15 +19,21 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {Button} from "@/components/ui/button";
 import {MoreHorizontal} from "lucide-react";
-import {CODE} from "@/constant/constant";
-import { updateCurriculumStatus} from "@/services/apis/curriculums.servicee";
+import {CODE, PAGE} from "@/constant/constant";
+import {getAllCurriculums, updateCurriculumStatus} from "@/services/apis/curriculums.servicee";
 import {AlertDialog, AlertDialogTrigger} from "@/components/ui/alert-dialog";
 import {Dialog, DialogTrigger} from "@/components/ui/dialog";
 import Alert from "@/app/quan-tri/khung-chuong-trinh/components/Alert";
 import Update from "@/app/quan-tri/khung-chuong-trinh/components/Update";
-import {KeyedMutator} from "swr";
+import useSWR from "swr";
 
-const CurriculumsTable = ({data, isLoading, mutate}:{data: ResponseData | undefined, isLoading: boolean, mutate: KeyedMutator<ResponseData>}) => {
+const CurriculumsTable = () => {
+    const [page, setPage] = React.useState(PAGE.INITIAL);
+    const {data, isLoading, mutate} = useSWR<ResponseData>(`api/curriculums?page=${page}`, () => getAllCurriculums({
+        jwt: localStorage.getItem("access-token"),
+        page,
+        pageSize: PAGE.SIZE,
+    }));
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
@@ -43,7 +48,7 @@ const CurriculumsTable = ({data, isLoading, mutate}:{data: ResponseData | undefi
             id: "serial",
             header: "STT",
             cell: ({ row }) => (
-                <div>{row.index + 1}</div>
+                <div>{(page - 1) * PAGE.SIZE + row.index + 1}</div>
             ),
         },
         {
@@ -112,7 +117,7 @@ const CurriculumsTable = ({data, isLoading, mutate}:{data: ResponseData | undefi
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
         getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
+        // getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         onColumnVisibilityChange: setColumnVisibility,
@@ -123,6 +128,8 @@ const CurriculumsTable = ({data, isLoading, mutate}:{data: ResponseData | undefi
             columnVisibility,
             rowSelection,
         },
+        manualPagination: true,
+        rowCount: (data?.data as DataList)?.count,
     })
 
 
@@ -133,57 +140,75 @@ const CurriculumsTable = ({data, isLoading, mutate}:{data: ResponseData | undefi
         <AlertDialog>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
                 <div className="rounded-md border">
-                <Table>
-                    <TableHeader>
-                        {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => {
-                                    return (
-                                        <TableHead key={header.id}>
-                                            {header.isPlaceholder
-                                                ? null
-                                                : flexRender(
-                                                    header.column.columnDef.header,
-                                                    header.getContext()
-                                                )}
-                                        </TableHead>
-                                    )
-                                })}
-                            </TableRow>
-                        ))}
-                    </TableHeader>
-                    <TableBody>
-                        {table.getRowModel().rows?.length ? (
-                            table.getRowModel().rows
-                                .map((row) => (
-                                    <TableRow
-                                        key={row.id}
-                                        data-state={row.getIsSelected() && "selected"}
+                    <Table>
+                        <TableHeader>
+                            {table.getHeaderGroups().map((headerGroup) => (
+                                <TableRow key={headerGroup.id}>
+                                    {headerGroup.headers.map((header) => {
+                                        return (
+                                            <TableHead key={header.id}>
+                                                {header.isPlaceholder
+                                                    ? null
+                                                    : flexRender(
+                                                        header.column.columnDef.header,
+                                                        header.getContext()
+                                                    )}
+                                            </TableHead>
+                                        )
+                                    })}
+                                </TableRow>
+                            ))}
+                        </TableHeader>
+                        <TableBody>
+                            {table.getRowModel().rows?.length ? (
+                                table.getRowModel().rows
+                                    .map((row) => (
+                                        <TableRow
+                                            key={row.id}
+                                            data-state={row.getIsSelected() && "selected"}
+                                        >
+                                            {row.getVisibleCells().map((cell) => (
+                                                <TableCell key={cell.id}>
+                                                    {flexRender(
+                                                        cell.column.columnDef.cell,
+                                                        cell.getContext()
+                                                    )}
+                                                </TableCell>
+                                            ))}
+                                        </TableRow>
+                                    ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell
+                                        colSpan={columns.length}
+                                        className="h-24 text-center"
                                     >
-                                        {row.getVisibleCells().map((cell) => (
-                                            <TableCell key={cell.id}>
-                                                {flexRender(
-                                                    cell.column.columnDef.cell,
-                                                    cell.getContext()
-                                                )}
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                ))
-                        ) : (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={columns.length}
-                                    className="h-24 text-center"
-                                >
-                                    No results.
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
+                                        No results.
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </div>
                 <Alert id={curriculumId} mutate={mutate}/>
+                <div className="flex items-center justify-end space-x-2 py-4">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setPage((prev: number) => prev - 1)}
+                        disabled={page === 1}
+                    >
+                        Trước
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setPage((prev: number) => prev + 1)}
+                        disabled={10 * page >= (data?.data as DataList)?.count}
+                    >
+                        Sau
+                    </Button>
+                </div>
                 <Update
                     id={curriculumId}
                     name={curriculumName}

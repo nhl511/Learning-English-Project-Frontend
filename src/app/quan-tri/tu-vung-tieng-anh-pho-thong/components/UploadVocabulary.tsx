@@ -2,17 +2,18 @@ import React from 'react';
 import {DialogContent, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog";
 import {Input} from "@/components/ui/input";
 import * as XLSX from "xlsx";
-import {ResponseData, Vocabulary} from "@/types";
+import { Vocabulary} from "@/types";
 import {Button} from "@/components/ui/button";
 import {createMultipleVocabulary} from "@/services/apis/vocabularies.service";
 import {CODE} from "@/constant/constant";
 import {useToast} from "@/hooks/use-toast";
-import {KeyedMutator} from "swr";
+import {useSWRConfig} from "swr";
 
-const UploadVocabulary = ({isDialogOpen, setIsDialogOpen, mutate}:{isDialogOpen: boolean, setIsDialogOpen: (value: boolean)=>void, mutate: KeyedMutator<ResponseData>}) => {
+const UploadVocabulary = ({isDialogOpen, setIsDialogOpen}:{isDialogOpen: boolean, setIsDialogOpen: (value: boolean)=>void}) => {
     const [excelData, setExcelData] = React.useState<Vocabulary[]>([]);
     const {toast} = useToast();
     const [isLoading, setIsLoading] = React.useState(false);
+    const { mutate } = useSWRConfig();
 
     const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
@@ -45,7 +46,7 @@ const UploadVocabulary = ({isDialogOpen, setIsDialogOpen, mutate}:{isDialogOpen:
             const result = await createMultipleVocabulary({vocabularies: excelData, jwt: localStorage.getItem("access-token")});
             switch (result.code){
                 case CODE.CREATED:
-                    mutate();
+                    await mutate((key: string) => key.startsWith('api/vocabularies?page='));
                     setIsLoading(false);
                     setIsDialogOpen(false)
                     toast({

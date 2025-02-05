@@ -5,7 +5,7 @@ import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {Form, FormControl, FormField, FormItem, FormMessage} from "@/components/ui/form";
 import {Input} from "@/components/ui/input";
-import useSWR, {KeyedMutator} from "swr";
+import useSWR, {useSWRConfig} from "swr";
 import {getPartsOfSpeechActive} from "@/services/apis/partsOfSpeech.service";
 import {
     Select,
@@ -57,14 +57,14 @@ const FormSchema = z.object({
     notes: z.string().max(255, {message: "Tối đa 255 kí tự"})
 })
 
-const AddVocabulary = ({isDialogOpen, setIsDialogOpen, mutate}:{isDialogOpen: boolean, setIsDialogOpen: (value: boolean)=>void, mutate: KeyedMutator<ResponseData>}) => {
+const AddVocabulary = ({isDialogOpen, setIsDialogOpen}:{isDialogOpen: boolean, setIsDialogOpen: (value: boolean)=>void}) => {
     const {data: activePartsOfSpeechData} = useSWR<ResponseData>("api/parts-of-speech/active", getPartsOfSpeechActive)
     const {data: activeCurriculumData} = useSWR<ResponseData>("api/curriculums/active", getActiveCurriculums)
     const [curriculumId, setCurriculumId] = React.useState<string>("")
     const [gradeId, setGradeId] = React.useState<string>("")
-
     const [gradesData, setGradesData] = React.useState<Grade[]>([])
     const [unitsData, setUnitsData] = React.useState<Unit[]>([])
+    const { mutate } = useSWRConfig();
 
 
     React.useEffect(()=>{
@@ -112,7 +112,7 @@ const AddVocabulary = ({isDialogOpen, setIsDialogOpen, mutate}:{isDialogOpen: bo
         switch (result.code) {
             case CODE.CREATED:
                 form.reset();
-                await mutate();
+                await mutate((key: string) => key.startsWith('api/vocabularies?page='));
                 setIsDialogOpen(false);
                 toast({description: "Thêm từ vựng mới thành công"})
         }

@@ -3,10 +3,9 @@ import {
     ColumnDef, ColumnFiltersState,
     getCoreRowModel,
     getFilteredRowModel,
-    getPaginationRowModel,
     getSortedRowModel, SortingState, VisibilityState
 } from "@tanstack/table-core";
-import {PartsOfSpeech, ResponseData} from "@/types";
+import {DataList, PartsOfSpeech, ResponseData} from "@/types";
 import {flexRender, useReactTable} from "@tanstack/react-table";
 import {Table, TableBody, TableCell, TableHead, TableHeader, TableRow} from "@/components/ui/table";
 import {
@@ -18,16 +17,23 @@ import {
 } from "@/components/ui/dropdown-menu";
 import {Button} from "@/components/ui/button";
 import {Copy, MoreHorizontal} from "lucide-react";
-import {CODE} from "@/constant/constant";
+import {CODE, PAGE} from "@/constant/constant";
 import {useToast} from "@/hooks/use-toast";
-import {updatePartsOfSpeechStatus} from "@/services/apis/partsOfSpeech.service";
+import {getAllPartsOfSpeech, updatePartsOfSpeechStatus} from "@/services/apis/partsOfSpeech.service";
 import {AlertDialog, AlertDialogTrigger} from "@/components/ui/alert-dialog";
 import Alert from "@/app/quan-tri/tu-loai/components/Alert";
 import {Dialog, DialogTrigger} from "@/components/ui/dialog";
 import Update from "@/app/quan-tri/tu-loai/components/Update";
-import {KeyedMutator} from "swr";
+import useSWR from "swr";
 
-const PartsOfSpeechTable = ({data, isLoading, mutate}:{data: ResponseData | undefined, isLoading: boolean, mutate: KeyedMutator<ResponseData>}) => {
+const PartsOfSpeechTable = () => {
+    const [page, setPage] = React.useState(PAGE.INITIAL);
+    const {data, isLoading, mutate} = useSWR<ResponseData>(`api/parts-of-speech?page=${page}`, () => getAllPartsOfSpeech({
+        jwt: localStorage.getItem("access-token"),
+        page,
+        pageSize: PAGE.SIZE,
+    }));
+
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
@@ -43,7 +49,7 @@ const PartsOfSpeechTable = ({data, isLoading, mutate}:{data: ResponseData | unde
             id: "serial",
             header: "STT",
             cell: ({ row }) => (
-                <div>{row.index + 1}</div>
+                <div>{(page - 1) * PAGE.SIZE + row.index + 1}</div>
             ),
         },
         {
@@ -124,7 +130,7 @@ const PartsOfSpeechTable = ({data, isLoading, mutate}:{data: ResponseData | unde
         onSortingChange: setSorting,
         onColumnFiltersChange: setColumnFilters,
         getCoreRowModel: getCoreRowModel(),
-        getPaginationRowModel: getPaginationRowModel(),
+        // getPaginationRowModel: getPaginationRowModel(),
         getSortedRowModel: getSortedRowModel(),
         getFilteredRowModel: getFilteredRowModel(),
         onColumnVisibilityChange: setColumnVisibility,
@@ -135,6 +141,8 @@ const PartsOfSpeechTable = ({data, isLoading, mutate}:{data: ResponseData | unde
             columnVisibility,
             rowSelection,
         },
+        manualPagination: true,
+        rowCount: (data?.data as DataList)?.count,
     })
 
 
@@ -144,57 +152,75 @@ const PartsOfSpeechTable = ({data, isLoading, mutate}:{data: ResponseData | unde
         <AlertDialog>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
 
-            <div className="rounded-md border">
-                <Table>
-                    <TableHeader>
-                        {table.getHeaderGroups().map((headerGroup) => (
-                            <TableRow key={headerGroup.id}>
-                                {headerGroup.headers.map((header) => {
-                                    return (
-                                        <TableHead key={header.id}>
-                                            {header.isPlaceholder
-                                                ? null
-                                                : flexRender(
-                                                    header.column.columnDef.header,
-                                                    header.getContext()
-                                                )}
-                                        </TableHead>
-                                    )
-                                })}
-                            </TableRow>
-                        ))}
-                    </TableHeader>
-                    <TableBody>
-                        {table.getRowModel().rows?.length ? (
-                            table.getRowModel().rows
-                                .map((row) => (
-                                    <TableRow
-                                        key={row.id}
-                                        data-state={row.getIsSelected() && "selected"}
+                <div className="rounded-md border">
+                    <Table>
+                        <TableHeader>
+                            {table.getHeaderGroups().map((headerGroup) => (
+                                <TableRow key={headerGroup.id}>
+                                    {headerGroup.headers.map((header) => {
+                                        return (
+                                            <TableHead key={header.id}>
+                                                {header.isPlaceholder
+                                                    ? null
+                                                    : flexRender(
+                                                        header.column.columnDef.header,
+                                                        header.getContext()
+                                                    )}
+                                            </TableHead>
+                                        )
+                                    })}
+                                </TableRow>
+                            ))}
+                        </TableHeader>
+                        <TableBody>
+                            {table.getRowModel().rows?.length ? (
+                                table.getRowModel().rows
+                                    .map((row) => (
+                                        <TableRow
+                                            key={row.id}
+                                            data-state={row.getIsSelected() && "selected"}
+                                        >
+                                            {row.getVisibleCells().map((cell) => (
+                                                <TableCell key={cell.id}>
+                                                    {flexRender(
+                                                        cell.column.columnDef.cell,
+                                                        cell.getContext()
+                                                    )}
+                                                </TableCell>
+                                            ))}
+                                        </TableRow>
+                                    ))
+                            ) : (
+                                <TableRow>
+                                    <TableCell
+                                        colSpan={columns.length}
+                                        className="h-24 text-center"
                                     >
-                                        {row.getVisibleCells().map((cell) => (
-                                            <TableCell key={cell.id}>
-                                                {flexRender(
-                                                    cell.column.columnDef.cell,
-                                                    cell.getContext()
-                                                )}
-                                            </TableCell>
-                                        ))}
-                                    </TableRow>
-                                ))
-                        ) : (
-                            <TableRow>
-                                <TableCell
-                                    colSpan={columns.length}
-                                    className="h-24 text-center"
-                                >
-                                    No results.
-                                </TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </div>
+                                        No results.
+                                    </TableCell>
+                                </TableRow>
+                            )}
+                        </TableBody>
+                    </Table>
+                </div>
+                <div className="flex items-center justify-end space-x-2 py-4">
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setPage((prev: number) => prev - 1)}
+                        disabled={page === 1}
+                    >
+                        Trước
+                    </Button>
+                    <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setPage((prev: number) => prev + 1)}
+                        disabled={10 * page >= (data?.data as DataList)?.count}
+                    >
+                        Sau
+                    </Button>
+                </div>
                 <Update
                     id={partsOfSpeechId}
                     name={partsOfSpeechName}

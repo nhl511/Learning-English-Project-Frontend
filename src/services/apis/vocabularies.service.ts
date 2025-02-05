@@ -2,10 +2,14 @@ import {apiCaller} from "@/axios/client";
 import {ENDPOINTS} from "@/services/apis/api-endpoints.service";
 import {ResponseData, Vocabulary} from "@/types";
 
-export const getAllVocabularies = async (jwt: string | null):Promise<ResponseData> => {
+export const getAllVocabularies = async ({jwt, page, pageSize}:{jwt: string | null, page: number, pageSize: number}):Promise<ResponseData> => {
     const result: ResponseData = await apiCaller.get(ENDPOINTS.vocabularies.base, {
         headers: {
             Authorization: `Bearer ${jwt}`,
+        },
+        params: {
+            page,
+            pageSize,
         }
     })
     return result

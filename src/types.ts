@@ -63,7 +63,8 @@ export interface DataList {
     grades: Grade[],
     units: Unit[],
     partsOfSpeeches: PartsOfSpeech[]
-    vocabularies: Vocabulary[]
+    vocabularies: Vocabulary[],
+    count: number
 }
 
 export interface Data {

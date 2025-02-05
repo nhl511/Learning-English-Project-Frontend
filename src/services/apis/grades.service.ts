@@ -2,10 +2,14 @@ import {ResponseData} from "@/types";
 import {apiCaller} from "@/axios/client";
 import {ENDPOINTS} from "@/services/apis/api-endpoints.service";
 
-export const getAllGrades = async(jwt: string | null): Promise<ResponseData> => {
+export const getAllGrades = async({jwt, page, pageSize}:{jwt: string | null, page: number, pageSize: number}): Promise<ResponseData> => {
     const result: ResponseData = await apiCaller.get(ENDPOINTS.grades.base, {
         headers: {
             Authorization: `Bearer ${jwt}`,
+        },
+        params: {
+            page,
+            pageSize,
         }
     });
     return result;

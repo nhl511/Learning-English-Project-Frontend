@@ -3,7 +3,9 @@ import {apiCaller} from "@/axios/client";
 import {ENDPOINTS} from "@/services/apis/api-endpoints.service";
 
 export const login = async({ email, password }:{ email: string, password: string }): Promise<ResponseData> => {
-    const result: ResponseData = await apiCaller.post(ENDPOINTS.auth.login, {email, password});
+    const result: ResponseData = await apiCaller.post(ENDPOINTS.auth.login, {email, password}, {
+        withCredentials: true
+    });
     return result;
 }
 

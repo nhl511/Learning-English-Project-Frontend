@@ -31,7 +31,7 @@ import {
 import Alert from "@/app/quan-tri/nguoi-dung/components/Alert";
 
 const UsersTable = () => {
-    const {data, isLoading, mutate} = useSWR<ResponseData>("/api/users", () => getAllUsers(localStorage.getItem("access-token")));
+    const {data, isLoading, mutate} = useSWR<ResponseData>("/api/users", getAllUsers);
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])
     const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({})
@@ -103,10 +103,10 @@ const UsersTable = () => {
                             {
                                 item.ACTIVE &&
                                 <DropdownMenuItem onClick={async()=> {
-                                    const result = await updateUserAdmin({id: item.ID, admin: !item.ADMIN, jwt: localStorage.getItem("access-token")})
+                                    const result = await updateUserAdmin({id: item.ID, admin: !item.ADMIN})
                                     switch (result?.code) {
                                         case CODE.SUCCESS:
-                                            mutate();
+                                            await mutate();
                                             toast({
                                                 description: "Cập nhật quản trị viên thành công",
                                             })
@@ -118,10 +118,10 @@ const UsersTable = () => {
                             {
                                 (!item.ADMIN && item.EMAIL_VERIFIED_AT ) && (
                                     <DropdownMenuItem onClick={async()=> {
-                                        const result = await updateUserStatus({id: item.ID, active: !item.ACTIVE, jwt: localStorage.getItem("access-token")})
+                                        const result = await updateUserStatus({id: item.ID, active: !item.ACTIVE})
                                         switch (result?.code) {
                                             case CODE.SUCCESS:
-                                                mutate();
+                                                await mutate();
                                                 toast({
                                                     description: "Cập nhật trạng thái tài khoản thành công",
                                                 })
@@ -168,8 +168,6 @@ const UsersTable = () => {
 
 
     if(isLoading) return <p>loading...</p>
-
-
 
     return (
         <AlertDialog>

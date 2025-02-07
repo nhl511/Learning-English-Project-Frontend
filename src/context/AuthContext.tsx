@@ -1,8 +1,6 @@
 "use client"
-import React, {ReactNode} from 'react';
+import React, {ReactNode, useRef} from 'react';
 import {jwtDecode} from "jwt-decode";
-import {getUserById} from "@/services/apis/users.service";
-import {AuthContextType, Jwt, User} from "@/types";
 import {useRouter} from "next/navigation";
 import {
     AlertDialog, AlertDialogAction,
@@ -11,72 +9,85 @@ import {
     AlertDialogHeader,
     AlertDialogTitle
 } from "@/components/ui/alert-dialog";
+import {AuthContextType, Jwt} from "@/types";
+import {logout} from "@/services/apis/auth.service";
+import {CODE} from "@/constant/constant";
 
 const AuthContext = React.createContext<AuthContextType | null>(null);
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-    const [token, setToken] = React.useState<string | null>(null);
-    const [user, setUser] = React.useState<User | null>(null);
     const [isExpired, setIsExpired] = React.useState(false);
     const router = useRouter()
+    const timerId = useRef<NodeJS.Timeout | null>(null)
+    const [haveJustLogin, setHaveJustLogin] = React.useState(false);
 
-    React.useEffect(() => {
-        if (!token) return;
 
-        const decoded = jwtDecode<Jwt>(token);
-        const expirationTime = decoded.exp * 1000; // Convert to milliseconds
-        const timeLeft = expirationTime - Date.now(); // Calculate time left
-
-        if (timeLeft > 0) {
-            // Set a timer to check when the token will expire
-            const timerId = setTimeout(() => {
-                setUser(null)
-                localStorage.removeItem("access-token");
-                document.cookie = "access-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC";
-                setIsExpired(true);
-                router.push("/dang-nhap");
-            }, timeLeft);
-
-            // Clean up the timer when component unmounts
-            return () => clearTimeout(timerId);
-        } else {
-            setToken(null);
-            localStorage.removeItem("access-token");
-            document.cookie = "access-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC";
-            setIsExpired(true)
-            router.push("/dang-nhap");
+    const getCookie = (cname: string) => {
+        const name = cname + "=";
+        const ca = document.cookie.split(';');
+        for(let i = 0; i < ca.length; i++) {
+            let c = ca[i];
+            while (c.charAt(0) == ' ') {
+                c = c.substring(1);
+            }
+            if (c.indexOf(name) == 0) {
+                return c.substring(name.length, c.length);
+            }
         }
-    }, [token]);
+        return "";
+    }
 
+    const scheduleLogout = () => {
+        const token = getCookie("access-token");
 
-    React.useEffect(() => {
-        const storedToken = localStorage.getItem("access-token");
-        if (storedToken) {
-            setToken(storedToken);
-        }
-    }, []);
+        if (token) {
+            try {
+                const decoded = jwtDecode<Jwt>(token);
+                const expirationTime = decoded.exp * 1000; // Convert to milliseconds
+                const currentTime = Date.now();
+                const remainingTime = expirationTime - currentTime;
 
-
-    const fetchUserData = async () => {
-        if (!token) return;
-
-        try {
-            const decoded = jwtDecode<Jwt>(token)
-            const response = await getUserById({id: decoded.userId, jwt: token});
-            if(response.data)
-                if ('user' in response.data) {
-                    setUser(response.data.user)
+                if (remainingTime <= 0) {
+                    logoutUser();
+                } else {
+                    timerId.current = setTimeout(logoutUser, remainingTime - 3 * 1000);
                 }
-
-
-        } catch (error) {
-            console.error("Error fetching user data:", error);
-            setUser(null);
+            } catch {
+                logoutUser(); // If decoding fails, assume expired
+            }
         }
     };
 
+    const logoutUser = async () => {
+        const res = await logout();
+        if (res.code === CODE.SUCCESS) {
+            setIsExpired(true);
+            router.push("/dang-nhap");
+            window.dispatchEvent(new Event("refreshNavbar")); // ✅ Trigger UI update
+            setHaveJustLogin(false);
+        }
+    };
+
+    React.useEffect(() => {
+        scheduleLogout();
+
+        return () => {
+            if (timerId.current) clearTimeout(timerId.current);
+        };
+    }, []);
+
+    React.useEffect(()=>{
+        if(haveJustLogin){
+            scheduleLogout();
+        }
+        return () => {
+            if (timerId.current) clearTimeout(timerId.current);
+        };
+    }, [haveJustLogin])
+
+
     return (
         <AlertDialog open={isExpired} onOpenChange={setIsExpired}>
-            <AuthContext.Provider value={{ token, setToken, user, setUser, fetchUserData }}>
+            <AuthContext.Provider value={{setHaveJustLogin, timerId}}>
                 {children}
             </AuthContext.Provider>
             <AlertDialogContent>

@@ -11,3 +11,10 @@ export const register = async({ email, password, firstName, lastName }:{ email: 
     const result: ResponseData = await apiCaller.post(ENDPOINTS.auth.register, {email, password, firstName, lastName});
     return result;
 }
+
+export const logout = async () => {
+    const result: ResponseData = await apiCaller.post(ENDPOINTS.auth.logout, {}, {
+        withCredentials: true,
+    })
+    return result
+}

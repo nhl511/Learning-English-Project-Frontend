@@ -1,8 +1,12 @@
+"use server"
 import {apiCaller} from "@/axios/client";
 import {ENDPOINTS} from "@/services/apis/api-endpoints.service";
 import {ResponseData} from "@/types";
+import {cookies} from "next/headers";
 
-export const getAllUnits = async({jwt, page, pageSize}:{jwt: string | null, page: number, pageSize: number}): Promise<ResponseData> => {
+export const getAllUnits = async({page, pageSize}:{ page: number, pageSize: number}): Promise<ResponseData> => {
+    const cookieStore= await cookies();
+    const jwt = cookieStore.get("access-token")?.value;
     const result: ResponseData = await apiCaller.get(ENDPOINTS.units.base, {
         headers: {
             Authorization: `Bearer ${jwt}`,
@@ -24,7 +28,9 @@ export const getActiveUnits = async(gradeId: string | undefined): Promise<Respon
     return result
 }
 
-export const createUnit = async({unitNumber, unitName, gradeId, jwt}:{unitNumber: number, unitName: string, gradeId: string, jwt: string | null}):Promise<ResponseData> => {
+export const createUnit = async({unitNumber, unitName, gradeId}:{unitNumber: number, unitName: string, gradeId: string}):Promise<ResponseData> => {
+    const cookieStore= await cookies();
+    const jwt = cookieStore.get("access-token")?.value;
     const result: ResponseData = await apiCaller.post(ENDPOINTS.units.base,{
         unitNumber,
         unitName,
@@ -37,7 +43,9 @@ export const createUnit = async({unitNumber, unitName, gradeId, jwt}:{unitNumber
     return result;
 }
 
-export const updateUnit = async({id, unitNumber, unitName, gradeId, jwt}:{id: string, unitNumber: number, unitName: string, gradeId: string, jwt: string | null}): Promise<ResponseData> => {
+export const updateUnit = async({id, unitNumber, unitName, gradeId}:{id: string, unitNumber: number, unitName: string, gradeId: string}): Promise<ResponseData> => {
+    const cookieStore= await cookies();
+    const jwt = cookieStore.get("access-token")?.value;
     const result: ResponseData = await apiCaller.put(ENDPOINTS.units.base + `/${id}`, {
         unitNumber,
         unitName,
@@ -50,7 +58,9 @@ export const updateUnit = async({id, unitNumber, unitName, gradeId, jwt}:{id: st
     return result;
 }
 
-export const updateUnitStatus = async({id, active, jwt}:{id: string, active: boolean, jwt: string | null}): Promise<ResponseData> => {
+export const updateUnitStatus = async({id, active}:{id: string, active: boolean}): Promise<ResponseData> => {
+    const cookieStore= await cookies();
+    const jwt = cookieStore.get("access-token")?.value;
     const result: ResponseData = await apiCaller.put(ENDPOINTS.units.updateUnitStatus + `/${id}`, {
         active
     },{
@@ -61,7 +71,9 @@ export const updateUnitStatus = async({id, active, jwt}:{id: string, active: boo
     return result;
 }
 
-export const deleteUnit = async({id, jwt}:{id: string, jwt: string | null}):Promise<ResponseData> => {
+export const deleteUnit = async(id: string):Promise<ResponseData> => {
+    const cookieStore= await cookies();
+    const jwt = cookieStore.get("access-token")?.value;
     const result: ResponseData = await apiCaller.delete(ENDPOINTS.units.base + `/${id}`, {
         headers: {
             Authorization: `Bearer ${jwt}`,

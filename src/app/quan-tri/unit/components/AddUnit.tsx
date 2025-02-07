@@ -64,7 +64,7 @@ const AddUnit = () => {
     })
 
     async function onSubmit(data: z.infer<typeof FormSchema>) {
-        const result = await createUnit({unitNumber: data.unitNumber, unitName: data.unitName, gradeId: data.gradeId, jwt: localStorage.getItem("access-token")})
+        const result = await createUnit({unitNumber: data.unitNumber, unitName: data.unitName, gradeId: data.gradeId})
         switch (result.code) {
             case CODE.CREATED:
                 await mutate((key: string) => key.startsWith('api/units?page='));

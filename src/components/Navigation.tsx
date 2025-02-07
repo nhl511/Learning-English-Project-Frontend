@@ -1,4 +1,4 @@
-"use client"
+"use server"
 import React from 'react';
 import Link from "next/link";
 import {
@@ -8,12 +8,17 @@ import {
     NavigationMenuList, navigationMenuTriggerStyle
 } from "@/components/ui/navigation-menu";
 import Auth from "@/components/Auth";
-import AuthContext from "@/context/AuthContext";
-import {NavigationItem} from "@/types";
+import {Data, Jwt, NavigationItem} from "@/types";
+import {jwtDecode} from "jwt-decode";
+import {getUserById} from "@/services/apis/users.service";
+import {cookies} from "next/headers";
+import RefreshAuth from "@/components/RefreshAuth";
 
-const Navigation = () => {
-    const authContext = React.useContext(AuthContext)
-
+const Navigation = async () => {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("access-token")?.value
+    const decoded = token ? jwtDecode<Jwt>(token) : null
+    const response = decoded ? await getUserById(decoded?.userId) : undefined;
 
     const publicLinks: NavigationItem[] = [{
         title: "Trang chủ",
@@ -52,7 +57,7 @@ const Navigation = () => {
                                 ))
                             }
                             {
-                                authContext?.user?.ADMIN && (
+                                (response?.data as Data)?.user?.ADMIN && (
                                     adminLinks.map((item: NavigationItem, index: number)=>(
                                         <NavigationMenuItem  key={index}>
                                             <Link href={item.path ?? ""} legacyBehavior passHref>
@@ -66,9 +71,10 @@ const Navigation = () => {
                             }
                         </NavigationMenuList>
                     </NavigationMenu>
-                    <Auth userLinks={userLinks}/>
+                    <Auth userLinks={userLinks} user={(response?.data as Data)?.user} />
                 </div>
             </div>
+            <RefreshAuth/>
         </div>
     );
 };

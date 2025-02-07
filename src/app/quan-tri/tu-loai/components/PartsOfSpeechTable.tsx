@@ -29,7 +29,6 @@ import useSWR from "swr";
 const PartsOfSpeechTable = () => {
     const [page, setPage] = React.useState(PAGE.INITIAL);
     const {data, isLoading, mutate} = useSWR<ResponseData>(`api/parts-of-speech?page=${page}`, () => getAllPartsOfSpeech({
-        jwt: localStorage.getItem("access-token"),
         page,
         pageSize: PAGE.SIZE,
     }));
@@ -93,11 +92,10 @@ const PartsOfSpeechTable = () => {
                                 const result = await updatePartsOfSpeechStatus({
                                     id: item.ID,
                                     active: !item.ACTIVE,
-                                    jwt: localStorage.getItem("access-token")
                                 })
                                 switch (result?.code) {
                                     case CODE.SUCCESS:
-                                        mutate();
+                                        await mutate();
                                         toast({
                                             description: "Cập nhật trạng thái từ loại thành công",
                                         })

@@ -1,8 +1,12 @@
+"use server"
 import {apiCaller} from "@/axios/client";
 import {ENDPOINTS} from "@/services/apis/api-endpoints.service";
 import {ResponseData, Vocabulary} from "@/types";
+import {cookies} from "next/headers";
 
-export const getAllVocabularies = async ({jwt, page, pageSize}:{jwt: string | null, page: number, pageSize: number}):Promise<ResponseData> => {
+export const getAllVocabularies = async ({ page, pageSize}:{page: number, pageSize: number}):Promise<ResponseData> => {
+    const cookieStore= await cookies();
+    const jwt = cookieStore.get("access-token")?.value;
     const result: ResponseData = await apiCaller.get(ENDPOINTS.vocabularies.base, {
         headers: {
             Authorization: `Bearer ${jwt}`,
@@ -15,7 +19,9 @@ export const getAllVocabularies = async ({jwt, page, pageSize}:{jwt: string | nu
     return result
 }
 
-export const createVocabulary = async({word, definition, transcription, partsOfSpeechId, unitId, notes, jwt}:{word: string, definition: string, transcription: string, partsOfSpeechId: string | undefined, unitId: string, notes: string, jwt: string | null}):Promise<ResponseData> => {
+export const createVocabulary = async({word, definition, transcription, partsOfSpeechId, unitId, notes}:{word: string, definition: string, transcription: string, partsOfSpeechId: string | undefined, unitId: string, notes: string}):Promise<ResponseData> => {
+    const cookieStore= await cookies();
+    const jwt = cookieStore.get("access-token")?.value;
     const result: ResponseData = await apiCaller.post(ENDPOINTS.vocabularies.base, {
         word,
         definition,
@@ -31,7 +37,9 @@ export const createVocabulary = async({word, definition, transcription, partsOfS
     return result;
 }
 
-export const createMultipleVocabulary = async({vocabularies, jwt}:{vocabularies: Vocabulary[], jwt: string | null}):Promise<ResponseData> => {
+export const createMultipleVocabulary = async(vocabularies: Vocabulary[]):Promise<ResponseData> => {
+    const cookieStore= await cookies();
+    const jwt = cookieStore.get("access-token")?.value;
     const result: ResponseData = await apiCaller.post(ENDPOINTS.vocabularies.addManyVocabulary, vocabularies,{
         headers: {
             Authorization: `Bearer ${jwt}`,
@@ -40,7 +48,9 @@ export const createMultipleVocabulary = async({vocabularies, jwt}:{vocabularies:
     return result;
 }
 
-export const updateVocabularyStatus = async({id, active, jwt}:{id: string, active: boolean, jwt: string | null}):Promise<ResponseData> => {
+export const updateVocabularyStatus = async({id, active}:{id: string, active: boolean}):Promise<ResponseData> => {
+    const cookieStore= await cookies();
+    const jwt = cookieStore.get("access-token")?.value;
     const result: ResponseData = await apiCaller.put(ENDPOINTS.vocabularies.updateVocabularyStatus + `/${id}`, {
         active
     },{
@@ -51,7 +61,9 @@ export const updateVocabularyStatus = async({id, active, jwt}:{id: string, activ
     return result;
 }
 
-export const updateVocabulary = async({id, word, definition, transcription, partsOfSpeechId, unitId, notes, jwt}:{id: string, word: string, definition: string, transcription: string | undefined, partsOfSpeechId: string | undefined, unitId: string, notes: string, jwt: string | null}):Promise<ResponseData> => {
+export const updateVocabulary = async({id, word, definition, transcription, partsOfSpeechId, unitId, notes}:{id: string, word: string, definition: string, transcription: string | undefined, partsOfSpeechId: string | undefined, unitId: string, notes: string}):Promise<ResponseData> => {
+    const cookieStore= await cookies();
+    const jwt = cookieStore.get("access-token")?.value;
     const result: ResponseData = await apiCaller.put(ENDPOINTS.vocabularies.base + `/${id}`, {
         word,
         definition,
@@ -67,7 +79,9 @@ export const updateVocabulary = async({id, word, definition, transcription, part
     return result;
 }
 
-export const deleteVocabulary = async({id, jwt}:{id: string, jwt: string | null}):Promise<ResponseData> => {
+export const deleteVocabulary = async(id: string):Promise<ResponseData> => {
+    const cookieStore= await cookies();
+    const jwt = cookieStore.get("access-token")?.value;
     const result: ResponseData = await apiCaller.delete(ENDPOINTS.vocabularies.base + `/${id}`, {
         headers: {
             Authorization: `Bearer ${jwt}`,

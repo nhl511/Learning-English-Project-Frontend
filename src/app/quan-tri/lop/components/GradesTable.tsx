@@ -31,7 +31,6 @@ const GradesTable = () => {
     const [page, setPage] = React.useState(PAGE.INITIAL);
 
     const {data, isLoading, mutate} = useSWR<ResponseData>(`api/grades?page=${page}`, () => getAllGrades({
-        jwt: localStorage.getItem("access-token"),
         page,
         pageSize: PAGE.SIZE,
     }));
@@ -92,11 +91,10 @@ const GradesTable = () => {
                                 const result = await updateGradeStatus({
                                     id: item.ID,
                                     active: !item.ACTIVE,
-                                    jwt: localStorage.getItem("access-token")
                                 })
                                 switch (result?.code) {
                                     case CODE.SUCCESS:
-                                        mutate();
+                                        await mutate();
                                         toast({
                                             description: "Cập nhật trạng thái lớp thành công",
                                         })

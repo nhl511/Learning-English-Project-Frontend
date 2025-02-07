@@ -1,8 +1,12 @@
+"use server"
 import {ResponseData} from "@/types";
 import {apiCaller} from "@/axios/client";
 import {ENDPOINTS} from "@/services/apis/api-endpoints.service";
+import {cookies} from "next/headers";
 
-export const getAllPartsOfSpeech = async ({jwt, page, pageSize}:{jwt: string | null, page: number, pageSize: number}): Promise<ResponseData> => {
+export const getAllPartsOfSpeech = async ({page, pageSize}:{page: number, pageSize: number}): Promise<ResponseData> => {
+    const cookieStore= await cookies();
+    const jwt = cookieStore.get("access-token")?.value;
     const result: ResponseData = await apiCaller.get(ENDPOINTS.partsOfSpeech.base, {
         headers: {
             Authorization: `Bearer ${jwt}`,
@@ -20,7 +24,9 @@ export const getPartsOfSpeechActive = async(): Promise<ResponseData> => {
     return result;
 }
 
-export const createPartsOfSpeech = async ({name, jwt}:{name: string, jwt: string | null}):Promise<ResponseData> => {
+export const createPartsOfSpeech = async (name: string):Promise<ResponseData> => {
+    const cookieStore= await cookies();
+    const jwt = cookieStore.get("access-token")?.value;
     const result: ResponseData = await apiCaller.post(ENDPOINTS.partsOfSpeech.base, {
         name
     },{
@@ -31,7 +37,9 @@ export const createPartsOfSpeech = async ({name, jwt}:{name: string, jwt: string
     return result;
 }
 
-export const updatePartsOfSpeech = async ({id, name, jwt}:{id: string, name: string, jwt: string | null}):Promise<ResponseData> => {
+export const updatePartsOfSpeech = async ({id, name}:{id: string, name: string}):Promise<ResponseData> => {
+    const cookieStore= await cookies();
+    const jwt = cookieStore.get("access-token")?.value;
     const result: ResponseData = await apiCaller.put(ENDPOINTS.partsOfSpeech.base + `/${id}`, {
         name
     },{
@@ -42,7 +50,9 @@ export const updatePartsOfSpeech = async ({id, name, jwt}:{id: string, name: str
     return result;
 }
 
-export const updatePartsOfSpeechStatus = async({id, active, jwt}:{id: string, active: boolean, jwt: string | null}):Promise<ResponseData> => {
+export const updatePartsOfSpeechStatus = async({id, active}:{id: string, active: boolean}):Promise<ResponseData> => {
+    const cookieStore= await cookies();
+    const jwt = cookieStore.get("access-token")?.value;
     const result: ResponseData = await apiCaller.put(ENDPOINTS.partsOfSpeech.updatePartsOfSpeechStatus + `/${id}`,{
         active
     },{
@@ -53,7 +63,9 @@ export const updatePartsOfSpeechStatus = async({id, active, jwt}:{id: string, ac
     return result;
 }
 
-export const deletePartsOfSpeech = async({id, jwt}:{id: string, jwt: string | null}):Promise<ResponseData> => {
+export const deletePartsOfSpeech = async(id: string):Promise<ResponseData> => {
+    const cookieStore= await cookies();
+    const jwt = cookieStore.get("access-token")?.value;
     const result: ResponseData = await apiCaller.delete(ENDPOINTS.partsOfSpeech.base + `/${id}`, {
         headers: {
             Authorization: `Bearer ${jwt}`,

@@ -27,11 +27,13 @@ const Alert = ({id, mutate}:{id: string, mutate: KeyedMutator<ResponseData>}) =>
             <AlertDialogFooter>
                 <AlertDialogCancel>Huỷ bỏ</AlertDialogCancel>
                 <AlertDialogAction onClick={async()=>{
-                    const result = await deleteGrade({id: id, jwt: localStorage.getItem("access-token")});
+                    const result = await deleteGrade(id);
                     switch (result?.code) {
                         case CODE.SUCCESS: toast(
                             {description: "Xoá lớp thành công"}
-                        ); mutate(); break;
+                        );
+                        await mutate();
+                        break;
                     }
                 }}>Xoá lớp</AlertDialogAction>
             </AlertDialogFooter>

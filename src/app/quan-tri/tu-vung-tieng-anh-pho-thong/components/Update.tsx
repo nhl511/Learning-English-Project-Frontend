@@ -67,7 +67,7 @@ const Update = ({id, vocabulary, definition, transcription, partsOfSpeechId, cur
     const [unitsData, setUnitsData] = React.useState<Unit[]>([])
 
     async function onSubmit(data: z.infer<typeof FormSchema>) {
-        const result = await updateVocabulary({id, word: data.word, definition: data.definition, transcription: data.transcription, partsOfSpeechId: data.partsOfSpeechId, unitId: data.unitId, notes: data.notes, jwt: localStorage.getItem("access-token")})
+        const result = await updateVocabulary({id, word: data.word, definition: data.definition, transcription: data.transcription, partsOfSpeechId: data.partsOfSpeechId, unitId: data.unitId, notes: data.notes})
         switch (result.code){
             case CODE.SUCCESS:
                 mutate();

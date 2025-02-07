@@ -51,7 +51,6 @@ const AddGrade = () => {
         const result = await createGrade({
             gradeNumber: data.grade,
             curriculumId: data.curriculumId,
-            jwt: localStorage.getItem("access-token"),
         })
         switch (result.code) {
             case CODE.CREATED:

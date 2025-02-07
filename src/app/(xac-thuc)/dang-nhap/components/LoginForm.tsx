@@ -51,12 +51,11 @@ const LoginForm = () => {
                     description: "Đăng nhập thành công!",
                 })
                 if(result.accessToken){
-                    if(!authContext) return null;
-                    localStorage.setItem("access-token", result.accessToken);
                     document.cookie = `access-token=${result.accessToken}; path=/;`;
-                    authContext.setToken(result.accessToken);
                 }
                 router.push("/")
+                window.dispatchEvent(new Event("refreshNavbar"));
+                authContext?.setHaveJustLogin(true)
                 break;
             case CODE.WRONG_CREDENTIALS:
                 setErrorMessage("Sai Email hoặc mật khẩu")
@@ -70,6 +69,12 @@ const LoginForm = () => {
 
         }
     }
+
+    React.useEffect(()=>{
+        if(authContext?.timerId.current)
+        clearTimeout(authContext?.timerId.current);
+        authContext?.setHaveJustLogin(false)
+    },[])
 
     return (
         <Form {...form}>

@@ -30,7 +30,6 @@ import useSWR from "swr";
 const UnitsTable = () => {
     const [page, setPage] = React.useState<number>(PAGE.INITIAL);
     const {data, isLoading, mutate} = useSWR(`api/units?page=${page}`, () => getAllUnits({
-        jwt: localStorage.getItem("access-token"),
         page,
         pageSize: PAGE.SIZE
     }));
@@ -118,7 +117,6 @@ const UnitsTable = () => {
                                 const result = await updateUnitStatus({
                                     id: item.ID,
                                     active: !item.ACTIVE,
-                                    jwt: localStorage.getItem("access-token")
                                 })
                                 switch (result?.code) {
                                     case CODE.SUCCESS:

@@ -35,7 +35,7 @@ const AddParsOfSpeech = () => {
     })
 
     async function onSubmit(data: z.infer<typeof FormSchema>) {
-        const result = await createPartsOfSpeech({name: data.name, jwt: localStorage.getItem("access-token")});
+        const result = await createPartsOfSpeech(data.name);
         switch (result.code){
             case CODE.CREATED:
                 await mutate((key: string) => key.startsWith('api/parts-of-speech?page='));

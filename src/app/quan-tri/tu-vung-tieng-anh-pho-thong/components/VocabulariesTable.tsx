@@ -29,7 +29,6 @@ import useSWR from "swr";
 const VocabulariesTable = () => {
     const [page, setPage] = React.useState<number>(PAGE.INITIAL);
     const {data, isLoading, mutate} = useSWR(`api/vocabularies?page=${page}`, () => getAllVocabularies({
-        jwt: localStorage.getItem("access-token"),
         page,
         pageSize: PAGE.SIZE,
     }))
@@ -142,11 +141,10 @@ const VocabulariesTable = () => {
                                 const result = await updateVocabularyStatus({
                                     id: item.ID,
                                     active: !item.ACTIVE,
-                                    jwt: localStorage.getItem("access-token")
                                 })
                                 switch (result?.code) {
                                     case CODE.SUCCESS:
-                                        mutate();
+                                        await mutate();
                                         toast({
                                             description: "Cập nhật trạng thái từ vựng thành công",
                                         })

@@ -27,11 +27,14 @@ const Alert = ({id, mutate}:{id: string, mutate: KeyedMutator<ResponseData>}) =>
             <AlertDialogFooter>
                 <AlertDialogCancel>Huỷ bỏ</AlertDialogCancel>
                 <AlertDialogAction onClick={async()=>{
-                    const result = await deletePartsOfSpeech({id: id, jwt: localStorage.getItem("access-token")});
+                    const result = await deletePartsOfSpeech(id);
                     switch (result?.code) {
-                        case CODE.SUCCESS: toast(
+                        case CODE.SUCCESS:
+                            toast(
                             {description: "Xoá từ loại thành công"}
-                        ); mutate(); break;
+                        );
+                            await mutate();
+                            break;
                     }
                 }}>Xoá từ loại</AlertDialogAction>
             </AlertDialogFooter>

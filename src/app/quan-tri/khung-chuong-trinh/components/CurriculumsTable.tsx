@@ -30,7 +30,6 @@ import useSWR from "swr";
 const CurriculumsTable = () => {
     const [page, setPage] = React.useState(PAGE.INITIAL);
     const {data, isLoading, mutate} = useSWR<ResponseData>(`api/curriculums?page=${page}`, () => getAllCurriculums({
-        jwt: localStorage.getItem("access-token"),
         page,
         pageSize: PAGE.SIZE,
     }));
@@ -81,7 +80,6 @@ const CurriculumsTable = () => {
                                 const result = await updateCurriculumStatus({
                                     id: item.ID,
                                     active: !item.ACTIVE,
-                                    jwt: localStorage.getItem("access-token")
                                 })
                                 switch (result?.code) {
                                     case CODE.SUCCESS:

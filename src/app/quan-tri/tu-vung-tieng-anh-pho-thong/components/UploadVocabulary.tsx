@@ -32,6 +32,7 @@ const UploadVocabulary = ({isDialogOpen, setIsDialogOpen}:{isDialogOpen: boolean
 
                     // Convert sheet data to JSON
                     const jsonData: Vocabulary[] = XLSX.utils.sheet_to_json(worksheet);
+                    // const arrayObjects: Vocabulary[] = JSON.parse(jsonData)
                     setExcelData(jsonData);
                 }
             };
@@ -43,7 +44,7 @@ const UploadVocabulary = ({isDialogOpen, setIsDialogOpen}:{isDialogOpen: boolean
     const handleSubmit = async() => {
         if (excelData.length !== 0) {
             setIsLoading(true)
-            const result = await createMultipleVocabulary({vocabularies: excelData, jwt: localStorage.getItem("access-token")});
+            const result = await createMultipleVocabulary(JSON.parse(JSON.stringify(excelData)));
             switch (result.code){
                 case CODE.CREATED:
                     await mutate((key: string) => key.startsWith('api/vocabularies?page='));

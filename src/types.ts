@@ -1,4 +1,5 @@
 import {LucideIcon} from "lucide-react";
+import {RefObject} from "react";
 
 export interface NavigationItem {
     title: string,
@@ -91,9 +92,6 @@ export interface Jwt {
 }
 
 export interface AuthContextType {
-    token: string | null;
-    setToken: (token: string | null) => void;
-    user: User | null;
-    setUser: (user: User | null) => void;
-    fetchUserData: () => Promise<void>;
+    setHaveJustLogin: (value: boolean) => void;
+    timerId: RefObject<NodeJS.Timeout | null>;
 }

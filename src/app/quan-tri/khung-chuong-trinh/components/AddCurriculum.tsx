@@ -35,7 +35,7 @@ const AddCurriculum = () => {
     })
 
     async function onSubmit(data: z.infer<typeof FormSchema>) {
-        const result = await createCurriculum({name: data.name, jwt: localStorage.getItem("access-token")});
+        const result = await createCurriculum(data.name);
         switch (result.code){
             case CODE.CREATED:
                 await mutate((key: string) => key.startsWith('api/curriculums?page='));

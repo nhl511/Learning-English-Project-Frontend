@@ -65,7 +65,6 @@ const Update = ({id, unitNumber, unitName, curriculumId, setCurriculumId, gradeI
             unitNumber: data.unitNumber,
             unitName: data.unitName,
             gradeId: data.gradeId,
-            jwt: localStorage.getItem("access-token"),
         })
         switch (result?.code) {
             case CODE.SUCCESS:

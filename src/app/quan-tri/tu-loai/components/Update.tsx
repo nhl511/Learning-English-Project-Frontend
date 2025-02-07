@@ -31,11 +31,11 @@ const Update = ({id, name, mutate, isDialogOpen, setIsDialogOpen}:{id: string, n
     })
 
     async function onSubmit(data: z.infer<typeof FormSchema>) {
-        const result = await updatePartsOfSpeech({id, name: data.name, jwt: localStorage.getItem("access-token")})
+        const result = await updatePartsOfSpeech({id, name: data.name})
         switch (result.code) {
             case 200:
                 toast({description: "Cập nhật từ loại thành công"});
-                mutate();
+                await mutate();
                 setIsDialogOpen(false);
                 break;
         }

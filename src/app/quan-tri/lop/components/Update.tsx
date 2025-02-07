@@ -45,10 +45,10 @@ const Update = ({id, grade, curriculumId, mutate, isDialogOpen, setIsDialogOpen}
         },
     })
     async function onSubmit(data: z.infer<typeof FormSchema>) {
-        const result = await updateGrade({id, grade: data.grade, curriculumId: data.curriculumId, jwt: localStorage.getItem("access-token")})
+        const result = await updateGrade({id, grade: data.grade, curriculumId: data.curriculumId})
         switch (result.code) {
             case CODE.SUCCESS:
-                mutate();
+                await mutate();
                 setIsDialogOpen(false)
                 toast({
                     description: "Cập nhật lớp thành công"

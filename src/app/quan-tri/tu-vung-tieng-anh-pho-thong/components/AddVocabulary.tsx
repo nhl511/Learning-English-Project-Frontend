@@ -107,7 +107,6 @@ const AddVocabulary = ({isDialogOpen, setIsDialogOpen}:{isDialogOpen: boolean, s
             partsOfSpeechId: data.partsOfSpeechId,
             unitId: data.unitId,
             notes: data.notes,
-            jwt: localStorage.getItem("access-token"),
         })
         switch (result.code) {
             case CODE.CREATED:

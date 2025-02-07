@@ -26,7 +26,7 @@ const Alert = ({id, mutate}:{id: string, mutate: KeyedMutator<ResponseData>}) =>
             <AlertDialogFooter>
                 <AlertDialogCancel>Huỷ bỏ</AlertDialogCancel>
                 <AlertDialogAction onClick={async()=>{
-                    const result = await deleteUnit({id: id, jwt: localStorage.getItem("access-token")});
+                    const result = await deleteUnit(id);
                     switch (result?.code) {
                         case CODE.SUCCESS: toast(
                             {description: "Xoá unit thành công"}

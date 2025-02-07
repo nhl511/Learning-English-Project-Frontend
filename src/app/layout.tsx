@@ -24,14 +24,15 @@ export default function RootLayout({
   return (
     <html lang="en" className={monts.className}>
       <body>
-          <AuthProvider>
               <Navigation/>
-              <div className="xl:container mx-auto px-[26px] xl:px-0 mt-[70px]">
-                  {children}
-              </div>
-              <Footer/>
-              <Toaster />
-          </AuthProvider>
+              <AuthProvider>
+                  <div className="xl:container mx-auto px-[26px] xl:px-0 mt-[70px]">
+                      {children}
+                  </div>
+                  <Footer/>
+                  <Toaster />
+              </AuthProvider>
+
       </body>
     </html>
   );

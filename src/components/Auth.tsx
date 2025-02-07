@@ -1,7 +1,6 @@
 "use client"
 import React from 'react';
 import Link from "next/link";
-import AuthContext from "@/context/AuthContext";
 import {
     DropdownMenu,
     DropdownMenuContent, DropdownMenuGroup, DropdownMenuItem,
@@ -9,36 +8,36 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger
 } from "@/components/ui/dropdown-menu";
-import {NavigationItem} from "@/types";
+import {NavigationItem, User} from "@/types";
 import {useRouter} from "next/navigation";
+import {logout} from "@/services/apis/auth.service";
+import {CODE} from "@/constant/constant";
+import {useToast} from "@/hooks/use-toast";
 
-const Auth = ({userLinks}:{userLinks: NavigationItem[]}) => {
-    const authContext = React.useContext(AuthContext);
+const Auth = ({userLinks, user}:{userLinks: NavigationItem[], user: User}) => {
     const router = useRouter();
+    const { toast } = useToast()
 
-    const handleLogout = () => {
-        if(!authContext) return null;
-        authContext.setToken(null)
-        authContext.setUser(null)
-        localStorage.removeItem("access-token");
-        document.cookie = "access-token=; path=/; expires=Thu, 01 Jan 1970 00:00:00 UTC";
-        router.push("/");
+    const handleLogout = async () => {
+        const result = await logout();
+        switch (result.code) {
+            case CODE.SUCCESS:
+                router.push("/dang-nhap");
+                window.dispatchEvent(new Event("refreshNavbar")); // ✅ Trigger UI update
+                toast({
+                    description: "Tài khoản của bạn đã đăng xuất",
+                })
+                break;
+        }
     }
-
-    React.useEffect(() => {
-        if(authContext?.token)
-            authContext.fetchUserData();
-    }, [authContext?.token]);
-
-    if(!authContext) return null;
 
     return (
         <div className="flex gap-[26px]">
             {
-                authContext.user ? (
+                user ? (
                         <DropdownMenu>
                             <DropdownMenuTrigger className="outline-none">
-                                {authContext.user.EMAIL}
+                                {user.EMAIL}
                             </DropdownMenuTrigger>
                             <DropdownMenuContent className="w-[200px]">
                                 <DropdownMenuLabel>My Account</DropdownMenuLabel>

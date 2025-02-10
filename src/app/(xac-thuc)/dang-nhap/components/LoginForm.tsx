@@ -50,9 +50,6 @@ const LoginForm = () => {
                 toast({
                     description: "Đăng nhập thành công!",
                 })
-                // if(result.accessToken){
-                //     document.cookie = `access-token=${result.accessToken}; path=/; secure; samesite=strict`;
-                // }
                 router.push("/")
                 window.dispatchEvent(new Event("refreshNavbar"));
                 authContext?.setHaveJustLogin(true)

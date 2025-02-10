@@ -6,7 +6,6 @@ import {zodResolver} from "@hookform/resolvers/zod";
 import {Form, FormControl, FormField, FormItem, FormMessage} from "@/components/ui/form";
 import {Input} from "@/components/ui/input";
 import useSWR, {useSWRConfig} from "swr";
-import {getPartsOfSpeechActive} from "@/services/apis/partsOfSpeech.service";
 import {
     Select,
     SelectContent,
@@ -16,7 +15,7 @@ import {
     SelectTrigger,
     SelectValue
 } from "@/components/ui/select";
-import {Curriculum, DataList, Grade, PartsOfSpeech, ResponseData, Unit} from "@/types";
+import {Curriculum, DataList, Grade, ResponseData, Unit} from "@/types";
 import {getActiveCurriculums} from "@/services/apis/curriculums.servicee";
 import {getActiveGrades} from "@/services/apis/grades.service";
 import {getActiveUnits} from "@/services/apis/units.service";
@@ -58,7 +57,6 @@ const FormSchema = z.object({
 })
 
 const AddVocabulary = ({isDialogOpen, setIsDialogOpen}:{isDialogOpen: boolean, setIsDialogOpen: (value: boolean)=>void}) => {
-    const {data: activePartsOfSpeechData} = useSWR<ResponseData>("api/parts-of-speech/active", getPartsOfSpeechActive)
     const {data: activeCurriculumData} = useSWR<ResponseData>("api/curriculums/active", getActiveCurriculums)
     const [curriculumId, setCurriculumId] = React.useState<string>("")
     const [gradeId, setGradeId] = React.useState<string>("")
@@ -104,10 +102,10 @@ const AddVocabulary = ({isDialogOpen, setIsDialogOpen}:{isDialogOpen: boolean, s
             word: data.word,
             definition: data.definition,
             transcription: data.transcription,
-            partsOfSpeechId: data.partsOfSpeechId,
             unitId: data.unitId,
             notes: data.notes,
         })
+
         switch (result.code) {
             case CODE.CREATED:
                 form.reset();
@@ -160,30 +158,42 @@ const AddVocabulary = ({isDialogOpen, setIsDialogOpen}:{isDialogOpen: boolean, s
                             </FormItem>
                         )}
                     />
+                    {/*<FormField*/}
+                    {/*    control={form.control}*/}
+                    {/*    name="partsOfSpeechId"*/}
+                    {/*    render={({ field }) => (*/}
+                    {/*        <FormItem>*/}
+                    {/*            <FormControl>*/}
+                    {/*                <Select onValueChange={field.onChange} defaultValue={field.value}>*/}
+                    {/*                <SelectTrigger>*/}
+                    {/*                        <SelectValue placeholder="Chọn từ loại (Không bắt buộc)" />*/}
+                    {/*                    </SelectTrigger>*/}
+                    {/*                    <SelectContent>*/}
+                    {/*                        <SelectGroup>*/}
+                    {/*                            <SelectLabel>Chọn từ loại</SelectLabel>*/}
+                    {/*                            {*/}
+                    {/*                                activePartsOfSpeechData?.data && "partsOfSpeeches" in activePartsOfSpeechData.data &&*/}
+                    {/*                                activePartsOfSpeechData?.data.partsOfSpeeches.map((item: PartsOfSpeech, index: number)=>(*/}
+                    {/*                                    <SelectItem key={index} value={item.ID}>{item.NAME}</SelectItem>*/}
+                    {/*                                ))*/}
+                    {/*                            }*/}
+                    {/*                        </SelectGroup>*/}
+                    {/*                    </SelectContent>*/}
+                    {/*                </Select>*/}
+                    {/*            </FormControl>*/}
+                    {/*            <FormMessage />*/}
+                    {/*        </FormItem>*/}
+                    {/*    )}*/}
+                    {/*/>*/}
                     <FormField
                         control={form.control}
-                        name="partsOfSpeechId"
-                        render={({ field }) => (
+                        name="notes"
+                        render={({field}) => (
                             <FormItem>
                                 <FormControl>
-                                    <Select onValueChange={field.onChange} defaultValue={field.value}>
-                                    <SelectTrigger>
-                                            <SelectValue placeholder="Chọn từ loại (Không bắt buộc)" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectGroup>
-                                                <SelectLabel>Chọn từ loại</SelectLabel>
-                                                {
-                                                    activePartsOfSpeechData?.data && "partsOfSpeeches" in activePartsOfSpeechData.data &&
-                                                    activePartsOfSpeechData?.data.partsOfSpeeches.map((item: PartsOfSpeech, index: number)=>(
-                                                        <SelectItem key={index} value={item.ID}>{item.NAME}</SelectItem>
-                                                    ))
-                                                }
-                                            </SelectGroup>
-                                        </SelectContent>
-                                    </Select>
+                                    <Input type="text" placeholder="Nhập từ loại (Không bắt buộc)" {...field} />
                                 </FormControl>
-                                <FormMessage />
+                                <FormMessage/>
                             </FormItem>
                         )}
                     />
@@ -283,18 +293,6 @@ const AddVocabulary = ({isDialogOpen, setIsDialogOpen}:{isDialogOpen: boolean, s
                                     </Select>
                                 </FormControl>
                                 <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="notes"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormControl>
-                                    <Input type="text" placeholder="Nhập ghi chú (Không bắt buộc)" {...field} />
-                                </FormControl>
-                                <FormMessage/>
                             </FormItem>
                         )}
                     />

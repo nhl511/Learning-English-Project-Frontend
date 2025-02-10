@@ -4,9 +4,8 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import useSWR, {KeyedMutator} from "swr";
-import {getPartsOfSpeechActive} from "@/services/apis/partsOfSpeech.service";
 import {getActiveCurriculums} from "@/services/apis/curriculums.servicee";
-import {Curriculum, DataList, Grade, PartsOfSpeech, ResponseData, Unit} from "@/types";
+import {Curriculum, DataList, Grade, ResponseData, Unit} from "@/types";
 import {DialogContent, DialogFooter, DialogHeader, DialogTitle} from "@/components/ui/dialog";
 import {Form, FormControl, FormField, FormItem, FormMessage} from "@/components/ui/form";
 import {Input} from "@/components/ui/input";
@@ -45,7 +44,6 @@ const FormSchema = z.object({
         .max(100, {
             message: "Tối đa 100 kí tự"
         }).optional(),
-    partsOfSpeechId: z.string().optional(),
     curriculumId: z.string({
         required_error: "Chọn giáo trình"
     }).min(1, {message: "Chọn giáo trình"}),
@@ -59,15 +57,14 @@ const FormSchema = z.object({
 })
 
 
-const Update = ({id, vocabulary, definition, transcription, partsOfSpeechId, curriculumId, setCurriculumId, gradeId, setGradeId, unitId, notes, mutate, isDialogOpen, setIsDialogOpen}:{id: string, vocabulary: string, definition: string, transcription: string, partsOfSpeechId: string | undefined, curriculumId: string, setCurriculumId: (value: string)=>void, gradeId: string, setGradeId: (value: string)=>void, unitId: string, notes: string, mutate: KeyedMutator<ResponseData>, isDialogOpen: boolean, setIsDialogOpen: (value:boolean)=>void}) => {
+const Update = ({id, vocabulary, definition, transcription, curriculumId, setCurriculumId, gradeId, setGradeId, unitId, notes, mutate, isDialogOpen, setIsDialogOpen}:{id: string, vocabulary: string, definition: string, transcription: string, curriculumId: string, setCurriculumId: (value: string)=>void, gradeId: string, setGradeId: (value: string)=>void, unitId: string, notes: string, mutate: KeyedMutator<ResponseData>, isDialogOpen: boolean, setIsDialogOpen: (value:boolean)=>void}) => {
     const {toast} = useToast();
-    const {data: activePartsOfSpeechData} = useSWR("api/parts-of-speech/active", getPartsOfSpeechActive)
     const {data: activeCurriculumData} = useSWR("api/curriculums/active", getActiveCurriculums)
     const [gradesData, setGradesData] = React.useState<Grade[]>([])
     const [unitsData, setUnitsData] = React.useState<Unit[]>([])
 
     async function onSubmit(data: z.infer<typeof FormSchema>) {
-        const result = await updateVocabulary({id, word: data.word, definition: data.definition, transcription: data.transcription, partsOfSpeechId: data.partsOfSpeechId, unitId: data.unitId, notes: data.notes})
+        const result = await updateVocabulary({id, word: data.word, definition: data.definition, transcription: data.transcription, unitId: data.unitId, notes: data.notes})
         switch (result.code){
             case CODE.SUCCESS:
                 mutate();
@@ -111,7 +108,6 @@ const Update = ({id, vocabulary, definition, transcription, partsOfSpeechId, cur
             form.setValue("word", vocabulary)
             form.setValue("definition", definition)
             form.setValue("transcription", transcription)
-            form.setValue("partsOfSpeechId", partsOfSpeechId)
             form.setValue("curriculumId", curriculumId)
             form.setValue("gradeId", gradeId)
             form.setValue("unitId", unitId)
@@ -166,34 +162,46 @@ const Update = ({id, vocabulary, definition, transcription, partsOfSpeechId, cur
                     />
                     <FormField
                         control={form.control}
-                        name="partsOfSpeechId"
-                        render={({ field }) => (
+                        name="notes"
+                        render={({field}) => (
                             <FormItem>
                                 <FormControl>
-                                    <Select
-                                        onValueChange={field.onChange}
-                                        defaultValue={field.value || ""}
-                                    >
-                                        <SelectTrigger>
-                                            <SelectValue placeholder="Chọn từ loại (Không bắt buộc)" />
-                                        </SelectTrigger>
-                                        <SelectContent>
-                                            <SelectGroup>
-                                                <SelectLabel>Chọn từ loại</SelectLabel>
-                                                {
-                                                    activePartsOfSpeechData?.data && "partsOfSpeeches" in activePartsOfSpeechData.data &&
-                                                    activePartsOfSpeechData?.data.partsOfSpeeches.map((item: PartsOfSpeech, index: number)=>(
-                                                        <SelectItem key={index} value={item.ID}>{item.NAME}</SelectItem>
-                                                    ))
-                                                }
-                                            </SelectGroup>
-                                        </SelectContent>
-                                    </Select>
+                                    <Input type="text" placeholder="Nhập từ loại (Không bắt buộc)" {...field} />
                                 </FormControl>
-                                <FormMessage />
+                                <FormMessage/>
                             </FormItem>
                         )}
                     />
+                    {/*<FormField*/}
+                    {/*    control={form.control}*/}
+                    {/*    name="partsOfSpeechId"*/}
+                    {/*    render={({ field }) => (*/}
+                    {/*        <FormItem>*/}
+                    {/*            <FormControl>*/}
+                    {/*                <Select*/}
+                    {/*                    onValueChange={field.onChange}*/}
+                    {/*                    defaultValue={field.value || ""}*/}
+                    {/*                >*/}
+                    {/*                    <SelectTrigger>*/}
+                    {/*                        <SelectValue placeholder="Chọn từ loại (Không bắt buộc)" />*/}
+                    {/*                    </SelectTrigger>*/}
+                    {/*                    <SelectContent>*/}
+                    {/*                        <SelectGroup>*/}
+                    {/*                            <SelectLabel>Chọn từ loại</SelectLabel>*/}
+                    {/*                            {*/}
+                    {/*                                activePartsOfSpeechData?.data && "partsOfSpeeches" in activePartsOfSpeechData.data &&*/}
+                    {/*                                activePartsOfSpeechData?.data.partsOfSpeeches.map((item: PartsOfSpeech, index: number)=>(*/}
+                    {/*                                    <SelectItem key={index} value={item.ID}>{item.NAME}</SelectItem>*/}
+                    {/*                                ))*/}
+                    {/*                            }*/}
+                    {/*                        </SelectGroup>*/}
+                    {/*                    </SelectContent>*/}
+                    {/*                </Select>*/}
+                    {/*            </FormControl>*/}
+                    {/*            <FormMessage />*/}
+                    {/*        </FormItem>*/}
+                    {/*    )}*/}
+                    {/*/>*/}
                     <FormField
                         control={form.control}
                         name="curriculumId"
@@ -290,18 +298,6 @@ const Update = ({id, vocabulary, definition, transcription, partsOfSpeechId, cur
                                     </Select>
                                 </FormControl>
                                 <FormMessage />
-                            </FormItem>
-                        )}
-                    />
-                    <FormField
-                        control={form.control}
-                        name="notes"
-                        render={({field}) => (
-                            <FormItem>
-                                <FormControl>
-                                    <Input type="text" placeholder="Nhập ghi chú (Không bắt buộc)" {...field} />
-                                </FormControl>
-                                <FormMessage/>
                             </FormItem>
                         )}
                     />

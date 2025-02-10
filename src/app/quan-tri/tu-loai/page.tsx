@@ -3,7 +3,8 @@ import PartsOfSpeechWrapper from "@/app/quan-tri/tu-loai/components/PartsOfSpeec
 
 const PartsOfSpeechManagementPage = () => {
     return (
-        <PartsOfSpeechWrapper/>
+            <></>
+        // <PartsOfSpeechWrapper/>
     );
 };
 

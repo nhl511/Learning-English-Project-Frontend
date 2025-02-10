@@ -19,14 +19,13 @@ export const getAllVocabularies = async ({ page, pageSize}:{page: number, pageSi
     return result
 }
 
-export const createVocabulary = async({word, definition, transcription, partsOfSpeechId, unitId, notes}:{word: string, definition: string, transcription: string, partsOfSpeechId: string | undefined, unitId: string, notes: string}):Promise<ResponseData> => {
+export const createVocabulary = async({word, definition, transcription, unitId, notes}:{word: string, definition: string, transcription: string, partsOfSpeechId: string | undefined, unitId: string, notes: string}):Promise<ResponseData> => {
     const cookieStore= await cookies();
     const jwt = cookieStore.get("access-token")?.value;
     const result: ResponseData = await apiCaller.post(ENDPOINTS.vocabularies.base, {
         word,
         definition,
         transcription,
-        partsOfSpeechId,
         unitId,
         notes,
     },{
@@ -61,14 +60,13 @@ export const updateVocabularyStatus = async({id, active}:{id: string, active: bo
     return result;
 }
 
-export const updateVocabulary = async({id, word, definition, transcription, partsOfSpeechId, unitId, notes}:{id: string, word: string, definition: string, transcription: string | undefined, partsOfSpeechId: string | undefined, unitId: string, notes: string}):Promise<ResponseData> => {
+export const updateVocabulary = async({id, word, definition, transcription, unitId, notes}:{id: string, word: string, definition: string, transcription: string | undefined, partsOfSpeechId: string | undefined, unitId: string, notes: string}):Promise<ResponseData> => {
     const cookieStore= await cookies();
     const jwt = cookieStore.get("access-token")?.value;
     const result: ResponseData = await apiCaller.put(ENDPOINTS.vocabularies.base + `/${id}`, {
         word,
         definition,
         transcription,
-        partsOfSpeechId,
         unitId,
         notes,
     },{

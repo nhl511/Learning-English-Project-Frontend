@@ -42,7 +42,6 @@ const VocabulariesTable = () => {
     const [vocabulary, setVocabulary] = React.useState<string>("")
     const [definition, setDefinition] = React.useState<string>("")
     const [transcription, setTranscription] = React.useState<string>("")
-    const [partsOfSpeechId, setPartsOfSpeechId] = React.useState<string>("")
     const [curriculumId, setCurriculumId] = React.useState<string>("")
     const [gradeId, setGradeId] = React.useState<string>("")
     const [unitId, setUnitId] = React.useState<string>("")
@@ -82,7 +81,7 @@ const VocabulariesTable = () => {
             accessorKey: "PARTS_OF_SPEECH",
             header: "Từ loại",
             cell: ({ row }) => {
-                const name = row.original.PARTS_OF_SPEECH?.NAME
+                const name = row.original.NOTES
                 return <div>{name}</div>;
             },
         },
@@ -110,13 +109,6 @@ const VocabulariesTable = () => {
                 const curriculum = row.original.UNIT.GRADE.CURRICULUM.NAME
                 return <div>{curriculum}</div>;
             },
-        },
-        {
-            accessorKey: "NOTES",
-            header: "Ghi chú",
-            cell: ({ row }) => (
-                <div>{row.getValue("NOTES")}</div>
-            ),
         },
         {
             accessorKey: "ACTIVE",
@@ -158,7 +150,6 @@ const VocabulariesTable = () => {
                                     setVocabulary(item.WORD)
                                     setDefinition(item.DEFINITION)
                                     setTranscription(item.TRANSCRIPTION)
-                                    setPartsOfSpeechId(item.PARTS_OF_SPEECH?.ID)
                                     setCurriculumId(item.UNIT.GRADE.CURRICULUM.ID)
                                     setGradeId(item.UNIT.GRADE.ID)
                                     setUnitId(item.UNIT.ID)
@@ -274,7 +265,7 @@ const VocabulariesTable = () => {
                     </Button>
                 </div>
                 <Update id={vocabularyId} vocabulary={vocabulary} definition={definition} transcription={transcription}
-                        partsOfSpeechId={partsOfSpeechId} curriculumId={curriculumId} setCurriculumId={setCurriculumId}
+                        curriculumId={curriculumId} setCurriculumId={setCurriculumId}
                         gradeId={gradeId} setGradeId={setGradeId} unitId={unitId} notes={notes} mutate={mutate}
                         isDialogOpen={isDialogOpen} setIsDialogOpen={setIsDialogOpen}/>
             </Dialog>

@@ -192,6 +192,10 @@ const VocabulariesTable = ({selectedCurriculumId, selectedGradeId, selectedUnitI
         rowCount: (data?.data as DataList)?.count,
     })
 
+    React.useEffect(()=>{
+        setPage(PAGE.INITIAL)
+    },[selectedCurriculumId, selectedGradeId, selectedUnitId])
+
     if(isLoading) return <p>loading...</p>
 
 

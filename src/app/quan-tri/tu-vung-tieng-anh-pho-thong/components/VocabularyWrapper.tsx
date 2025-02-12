@@ -7,14 +7,20 @@ import {DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger
 import {Button} from "@/components/ui/button";
 import {FileUp, Plus} from "lucide-react";
 import UploadVocabulary from "@/app/quan-tri/tu-vung-tieng-anh-pho-thong/components/UploadVocabulary";
+import FilterVocabulary from "@/app/quan-tri/tu-vung-tieng-anh-pho-thong/components/FilterVocabulary";
 
 const VocabularyWrapper = () => {
     const [isAddVocabularyDialogOpen, setIsAddVocabularyDialogOpen] = React.useState(false);
     const [isUploadVocabularyDialogOpen, setIsUploadVocabularyDialogOpen] = React.useState(false);
+    const [curriculumId, setCurriculumId] = React.useState<string | null>(null);
+    const [gradeId, setGradeId] = React.useState<string | null>(null);
+    const [unitId, setUnitId] = React.useState<string | null>(null);
+
     return (
         <div>
                 <DropdownMenu>
-                    <div className="flex justify-end w-full gap-4 mb-5">
+                    <div className="flex justify-between w-full gap-4 mb-5">
+                        <FilterVocabulary setCurriculumId={setCurriculumId} setGradeId={setGradeId} setUnitId={setUnitId} />
                         <DropdownMenuTrigger asChild>
                            <Button>Thêm từ vựng</Button>
                         </DropdownMenuTrigger>
@@ -30,7 +36,7 @@ const VocabularyWrapper = () => {
             <Dialog open={isUploadVocabularyDialogOpen} onOpenChange={setIsUploadVocabularyDialogOpen}>
                 <UploadVocabulary isDialogOpen={isUploadVocabularyDialogOpen} setIsDialogOpen={setIsUploadVocabularyDialogOpen}/>
             </Dialog>
-            <VocabulariesTable/>
+            <VocabulariesTable selectedCurriculumId={curriculumId} selectedGradeId={gradeId} selectedUnitId={unitId} />
         </div>
     );
 };

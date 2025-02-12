@@ -26,11 +26,14 @@ import {Dialog, DialogTrigger} from "@/components/ui/dialog";
 import Update from "@/app/quan-tri/tu-vung-tieng-anh-pho-thong/components/Update";
 import useSWR from "swr";
 
-const VocabulariesTable = () => {
+const VocabulariesTable = ({selectedCurriculumId, selectedGradeId, selectedUnitId}:{selectedCurriculumId: string | null, selectedGradeId: string | null, selectedUnitId: string | null}) => {
     const [page, setPage] = React.useState<number>(PAGE.INITIAL);
-    const {data, isLoading, mutate} = useSWR(`api/vocabularies?page=${page}`, () => getAllVocabularies({
+    const {data, isLoading, mutate} = useSWR(`api/vocabularies?page=${page}&curriculumId=${selectedCurriculumId}&gradeId=${selectedGradeId}&unitId=${selectedUnitId}`, () => getAllVocabularies({
         page,
         pageSize: PAGE.SIZE,
+        curriculumId: selectedCurriculumId,
+        gradeId: selectedGradeId,
+        unitId: selectedUnitId,
     }))
     const [sorting, setSorting] = React.useState<SortingState>([])
     const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([])

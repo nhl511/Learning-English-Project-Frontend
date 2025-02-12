@@ -4,7 +4,7 @@ import {ENDPOINTS} from "@/services/apis/api-endpoints.service";
 import {ResponseData, Vocabulary} from "@/types";
 import {cookies} from "next/headers";
 
-export const getAllVocabularies = async ({ page, pageSize}:{page: number, pageSize: number}):Promise<ResponseData> => {
+export const getAllVocabularies = async ({ page, pageSize, curriculumId, gradeId, unitId }:{page: number, pageSize: number, curriculumId: string | null, gradeId: string | null, unitId: string | null}):Promise<ResponseData> => {
     const cookieStore= await cookies();
     const jwt = cookieStore.get("access-token")?.value;
     const result: ResponseData = await apiCaller.get(ENDPOINTS.vocabularies.base, {
@@ -14,6 +14,9 @@ export const getAllVocabularies = async ({ page, pageSize}:{page: number, pageSi
         params: {
             page,
             pageSize,
+            curriculumId,
+            gradeId,
+            unitId,
         }
     })
     return result

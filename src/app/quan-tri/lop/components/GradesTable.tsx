@@ -199,38 +199,41 @@ const GradesTable = () => {
                         </TableBody>
                     </Table>
                 </div>
-                <div className="flex items-center justify-end space-x-2 py-4">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPage((prev: number) => prev - 1)}
-                        disabled={page === 1}
-                    >
-                        Trước
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPage((prev: number) => prev + 1)}
-                        disabled={10 * page >= (data?.data as DataList)?.count}
-                    >
-                        Sau
-                    </Button>
+                <div className="flex justify-between items-center">
+                    <span className="text-sm">Trang: {page}/{Math.ceil((data?.data as DataList)?.count / 10)}</span>
+                    <div className="flex items-center justify-end space-x-2 py-4">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setPage((prev: number) => prev - 1)}
+                            disabled={page === 1}
+                        >
+                            Trước
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setPage((prev: number) => prev + 1)}
+                            disabled={10 * page >= (data?.data as DataList)?.count}
+                        >
+                            Sau
+                        </Button>
+                    </div>
                 </div>
-                <Update
-                    id={gradeId}
-                    grade={grade}
-                    curriculumId={curriculumId}
-                    mutate={mutate}
-                    isDialogOpen={isDialogOpen}
-                    setIsDialogOpen={setIsDialogOpen}
-                />
+                    <Update
+                        id={gradeId}
+                        grade={grade}
+                        curriculumId={curriculumId}
+                        mutate={mutate}
+                        isDialogOpen={isDialogOpen}
+                        setIsDialogOpen={setIsDialogOpen}
+                    />
             </Dialog>
 
             <Alert id={gradeId} mutate={mutate}/>
         </AlertDialog>
 
-    );
+);
 };
 
 export default GradesTable;

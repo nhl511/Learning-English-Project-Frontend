@@ -63,7 +63,9 @@ const LoginForm = () => {
             case CODE.BANNED:
                 setErrorMessage("Tài khoản của bạn đã bị chặn. Vui lòng liên hệ quản trị viên để được hỗ trợ.")
                 break;
-
+            case CODE.SERVER_ERROR:
+                setErrorMessage("Lỗi Server. Vui lòng thử lại sau.")
+                break;
         }
     }
 

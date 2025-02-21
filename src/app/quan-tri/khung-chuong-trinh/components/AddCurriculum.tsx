@@ -10,6 +10,7 @@ import {z} from "zod";
 import {useForm} from "react-hook-form";
 import {zodResolver} from "@hookform/resolvers/zod";
 import {useSWRConfig} from "swr";
+import {useRouter} from "next/navigation";
 
 
 const FormSchema = z.object({
@@ -42,7 +43,8 @@ const AddCurriculum = () => {
                 form.reset();
                 toast({
                     description: "Tạo giáo trình thành công",
-                })
+                });
+                break;
         }
     }
 

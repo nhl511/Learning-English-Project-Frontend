@@ -253,32 +253,36 @@ const VocabulariesTable = ({selectedCurriculumId, selectedGradeId, selectedUnitI
                         </TableBody>
                     </Table>
                 </div>
-                <div className="flex items-center justify-end space-x-2 py-4">
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPage((prev: number)=> prev - 1)}
-                        disabled={page === 1}
-                    >
-                        Trước
-                    </Button>
-                    <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPage((prev: number)=> prev + 1)}
-                        disabled={10 * page >= (data?.data as DataList)?.count}
-                    >
-                        Sau
-                    </Button>
+                <div className="flex justify-between items-center">
+                    <span className="text-sm">Trang: {page}/{Math.ceil((data?.data as DataList)?.count / 10)}</span>
+                    <div className="flex items-center justify-end space-x-2 py-4">
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setPage((prev: number) => prev - 1)}
+                            disabled={page === 1}
+                        >
+                            Trước
+                        </Button>
+                        <Button
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setPage((prev: number) => prev + 1)}
+                            disabled={10 * page >= (data?.data as DataList)?.count}
+                        >
+                            Sau
+                        </Button>
+                    </div>
                 </div>
-                <Update id={vocabularyId} vocabulary={vocabulary} definition={definition} transcription={transcription}
-                        curriculumId={curriculumId} setCurriculumId={setCurriculumId}
-                        gradeId={gradeId} setGradeId={setGradeId} unitId={unitId} notes={notes} mutate={mutate}
-                        isDialogOpen={isDialogOpen} setIsDialogOpen={setIsDialogOpen}/>
+                    <Update id={vocabularyId} vocabulary={vocabulary} definition={definition}
+                            transcription={transcription}
+                            curriculumId={curriculumId} setCurriculumId={setCurriculumId}
+                            gradeId={gradeId} setGradeId={setGradeId} unitId={unitId} notes={notes} mutate={mutate}
+                            isDialogOpen={isDialogOpen} setIsDialogOpen={setIsDialogOpen}/>
             </Dialog>
             <Alert id={vocabularyId} mutate={mutate}/>
         </AlertDialog>
-    );
+);
 };
 
 export default VocabulariesTable;

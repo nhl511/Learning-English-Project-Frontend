@@ -5,6 +5,7 @@ export const CODE = {
     FORBIDDEN: 403,
     CONFLICT: 409,
     BANNED: 423,
+    SERVER_ERROR: 500,
 }
 
 export const PAGE = {
